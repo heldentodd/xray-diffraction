@@ -1,0 +1,25 @@
+{
+  "name": "xray-diffraction",
+  "version": "1.0.0-dev.0",
+  "license": "GPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/phetsims/xray-diffraction.git"
+  },
+  "devDependencies": {
+    "grunt": "~1.0.0"
+  },
+  "phet": {
+    "requirejsNamespace": "XRAY_DIFFRACTION",
+    "simulation": true,
+    "runnable": true,
+    "readmeCreatedManually": true,
+    "supportedBrands": [
+      "phet",
+      "adapted-from-phet"
+    ]
+  },
+  "eslintConfig": {
+    "extends": "../chipper/eslint/sim_es6_eslintrc.js"
+  }
+}

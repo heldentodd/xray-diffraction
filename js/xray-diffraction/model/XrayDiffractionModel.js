@@ -29,16 +29,16 @@ class XrayDiffractionModel {
   
        this.lattice = new Lattice ( new Vector3( 3.82, 3.89, 7.8 ) , 0 );
        this.sourceAngleProperty = new NumberProperty( Math.PI / 3 );
-       this.sourceWavelengthP = new NumberProperty( 8 );
-       this.horizontalRays = new NumberProperty( 0 );
-       this.verticalRays = new NumberProperty( 2 );
+       this.sourceWavelengthProperty = new NumberProperty( 8 );
+       this.horizontalRaysProperty = new NumberProperty( 0 );
+       this.verticalRaysProperty = new NumberProperty( 2 );
        this.animateProperty = new BooleanProperty( false );
        this.pathDifferenceProperty = new BooleanProperty( false );
        this.showParmsProperty = new BooleanProperty( false );
        this.showWaveFrontsProperty = new BooleanProperty( false );
 
        this.pLDProperty = new DerivedProperty( [this.lattice.latticeConstantsP, this.sourceAngleProperty ], computepLD );
-       this.pLDWavelengthsProperty = new DerivedProperty( [this.pLDProperty, this.sourceWavelengthP], computepLDWavelengths );
+       this.pLDWavelengthsProperty = new DerivedProperty( [this.pLDProperty, this.sourceWavelengthProperty], computepLDWavelengths );
 
        this.startPhase = 0 ;
   }
@@ -49,9 +49,9 @@ class XrayDiffractionModel {
    */
   reset() {
     this.sourceAngleProperty.reset();
-    this.sourceWavelengthP.reset();
-    this.horizontalRays.reset();
-    this.verticalRays.reset();
+    this.sourceWavelengthProperty.reset();
+    this.horizontalRaysProperty.reset();
+    this.verticalRaysProperty.reset();
     this.animateProperty.reset();
     this.pathDifferenceProperty.reset();
     this.showParmsProperty.reset();

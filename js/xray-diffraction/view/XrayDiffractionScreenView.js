@@ -9,6 +9,7 @@ import ResetAllButton from '../../../../scenery-phet/js/buttons/ResetAllButton.j
 import Tandem from '../../../../tandem/js/Tandem.js';
 import XrayDiffractionConstants from '../../common/XrayDiffractionConstants.js';
 import xrayDiffraction from '../../xrayDiffraction.js';
+import xrayDiffractionStrings from '../../xrayDiffractionStrings.js';
 import XrayDiffractionModel from '../model/XrayDiffractionModel.js';
 
 import ArrowNode from '../../../../scenery-phet/js/ArrowNode.js';
@@ -32,10 +33,14 @@ import Vector2 from '../../../../dot/js/Vector2.js';
 import XrayControlPanel from './XrayControlPanel.js';
 import XrayParameterPanel from './XrayParameterPanel.js';
 
+//strings
+const distanceString = xrayDiffractionStrings.distance;
+const inPhaseString = xrayDiffractionStrings.inPhase;
+const pathDifferenceEqualsString = xrayDiffractionStrings.pathDifferenceEquals;
+  
 const DIMENSION_ARROW_OPTIONS = { fill: 'black', stroke: null, tailWidth: 2, headWidth: 7, headHeight: 20, doubleHead: true };
 const AMP = 10;
 const scaleF = 8;
-
 
 class XrayDiffractionScreenView extends ScreenView {
 
@@ -70,6 +75,7 @@ class XrayDiffractionScreenView extends ScreenView {
       
     model.pLDWavelengthsProperty.changedEmitter.addListener( () => {
       if (Math.abs( model.pLDWavelengthsProperty.value - Utils.roundSymmetric(model.pLDWavelengthsProperty.value) ) < 0.014 ) {
+
         //reorient text and make it visible
         const theta = model.sourceAngleProperty.get();
         const rayEnd = new Vector2(this.crystalNode.centerX,this.crystalNode.centerY).minus(model.lattice.sites[0].timesScalar(scaleF));
@@ -83,7 +89,7 @@ class XrayDiffractionScreenView extends ScreenView {
           rayStart = rayStart.addXY( - 2.2 * AMP * Math.sin(theta), - 2.2 * AMP * Math.cos(theta) );
         }
         inPhaseText.rotation = - model.sourceAngleProperty.value;
-        inPhaseText.text = 'In phase! Path difference = ' + Utils.toFixed( model.pLDWavelengthsProperty.value, 0 ) +' λ' ;
+        inPhaseText.text = inPhaseString + ' ' + pathDifferenceEqualsString + Utils.toFixed( model.pLDWavelengthsProperty.value, 0 ) +' λ' ;
         inPhaseText.center = rayStart;
       }
       else {
@@ -93,9 +99,9 @@ class XrayDiffractionScreenView extends ScreenView {
 
     // update display when wavelength, ray grid, or path difference checkbox changes
     Property.multilink( [
-      model.sourceWavelengthP,
-      model.horizontalRays,
-      model.verticalRays,
+      model.sourceWavelengthProperty,
+      model.horizontalRaysProperty,
+      model.verticalRaysProperty,
       model.showWaveFrontsProperty,
       model.pathDifferenceProperty
       ], () => { this.redrawLight(model, this.crystalNode); } );
@@ -253,7 +259,7 @@ class XrayDiffractionScreenView extends ScreenView {
    * @public
    */
   reset() {
-  //  todo
+  //  done in the reset all button
   }
 
   redrawLight(model, crystalNode) {
@@ -262,9 +268,8 @@ class XrayDiffractionScreenView extends ScreenView {
   }
   
   drawLight(model, crystalNode) {
-    const scaleF = 8;
     const theta = model.sourceAngleProperty.get();
-    const lamda = scaleF * model.sourceWavelengthP.get();
+    const lamda = scaleF * model.sourceWavelengthProperty.get();
     const raySeparation = scaleF * ( model.lattice.latticeConstantsP.value.z * Math.cos(theta));
       
     const incidentRay1End = new Vector2(crystalNode.centerX,crystalNode.centerY).minus(model.lattice.sites[0].timesScalar(scaleF));
@@ -323,13 +328,13 @@ class XrayDiffractionScreenView extends ScreenView {
       const pLDLabelCenter = pLDArrowStart.plusXY(5 * Math.sin(theta) - (dSinTheta * Math.cos(theta))/2 , 5 * Math.cos(theta) + (dSinTheta * Math.sin(theta))/2 );
       const pLDDimensionArrow = new ArrowNode( pLDArrowStart.x , pLDArrowStart.y , pLDArrowEnd.x , pLDArrowEnd.y , DIMENSION_ARROW_OPTIONS );
       this.lightPathsNode.addChild( pLDDimensionArrow );
-      const pLDDimensionLabel = new RichText( 'd<i>sin</i>(θ)', { maxWidth: 400, left: pLDLabelCenter.x, centerY: pLDLabelCenter.y } );
+      const pLDDimensionLabel = new RichText( distanceString + '<i>sin</i>(θ)', { maxWidth: 400, left: pLDLabelCenter.x, centerY: pLDLabelCenter.y } );
       this.lightPathsNode.addChild( pLDDimensionLabel );
     }
   
   // Main logic to draw the light rays
-    const horiz = Math.floor ( Math.min( model.horizontalRays.get() ,  20 / model.lattice.latticeConstantsP.get().x  ) );
-    const vert = Math.min ( Math.floor( model.verticalRays.get() ) , 1 + 2 * Math.floor( 20 / model.lattice.latticeConstantsP.get().z ) );
+    const horiz = Math.floor ( Math.min( model.horizontalRaysProperty.get() ,  20 / model.lattice.latticeConstantsP.get().x  ) );
+    const vert = Math.min ( Math.floor( model.verticalRaysProperty.get() ) , 1 + 2 * Math.floor( 20 / model.lattice.latticeConstantsP.get().z ) );
     for (let i = - horiz; i <= horiz; i++) {
       for (let j = 0; j < vert; j++) {
         const shift = new Vector2( scaleF * i * model.lattice.latticeConstantsP.get().x, - scaleF * j * model.lattice.latticeConstantsP.get().z );
@@ -341,8 +346,16 @@ class XrayDiffractionScreenView extends ScreenView {
         const exitRayPhase = (incidentRayLength / lamda /*- Math.floor(incidentRayLength / lamda)*/) * 2 * Math.PI + model.startPhase;
         const extraLength = 2 * scaleF * Math.cos(theta) * i * model.lattice.latticeConstantsP.get().x;
         const exitRayEnd = new Vector2(2 * incidentRayEnd.x - incidentRayStart.x + extraLength * Math.cos(theta), incidentRayStart.y - extraLength * Math.sin(theta));
-        this.lightPathsNode.addChild( new LightPathNode ( incidentRayStart , incidentRayEnd , scaleF * model.sourceWavelengthP.get(), AMP, model.startPhase, model.showWaveFrontsProperty.value, raySeparation ) );
-        this.lightPathsNode.addChild( new LightPathNode ( incidentRayEnd , exitRayEnd , scaleF * model.sourceWavelengthP.get(), AMP, exitRayPhase, model.showWaveFrontsProperty.value, raySeparation ) );
+        this.lightPathsNode.addChild( new LightPathNode ( incidentRayStart , incidentRayEnd , scaleF * model.sourceWavelengthProperty.get(), {
+          amplitude: AMP,
+          startPhase: model.startPhase,
+          waveFrontWidth: raySeparation * model.showWaveFrontsProperty.value
+         } ) );
+        this.lightPathsNode.addChild( new LightPathNode ( incidentRayEnd , exitRayEnd , scaleF * model.sourceWavelengthProperty.get(), {
+          amplitude: AMP,
+          startPhase: exitRayPhase,
+          waveFrontWidth: raySeparation * model.showWaveFrontsProperty.value
+         } ) );
       }
     }
     this.addChild( this.lightPathsNode );
@@ -354,7 +367,7 @@ class XrayDiffractionScreenView extends ScreenView {
    * @public
    */
   step( dt ) {
-    //TODO
+    //stepping handeled in model
   }
 }
 

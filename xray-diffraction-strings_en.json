@@ -1,5 +1,53 @@
 {
   "xray-diffraction.title": {
-    "value": "Xray Diffraction"
+    "value": "Xray DiffractionT"
+  },
+  "incidentAngle": {
+    "value": "Incident Angle"
+  },
+  "wavelength": {
+    "value": "Wavelenth"
+  },
+  "horizontalRays": {
+    "value": "Horizontal Rays"
+  },
+  "verticalRays": {
+    "value": "Vertical Rays"
+  },
+  "aLatticeConstant": {
+    "value": "a"
+  },
+  "bLatticeConstant": {
+    "value": "b"
+  },
+  "LatticeConstant": {
+    "value": "Lattice Constant"
+  },
+  "distance": {
+    "value": "d"
+  },
+  "animate": {
+    "value": "Animate"
+  },
+  "pathDifference": {
+    "value": "Path Difference"
+  },
+  "showWavefronts": {
+    "value": "Show Wavefronts"
+  },
+  "showParameters": {
+    "value": "Show Parameters"
+  },
+  "inPhase": {
+    "value": "In Phase!"
+  },
+  "pathDifferenceEquals": {
+    "value": "Path Difference = "
+  },
+  "wavelengthUnit": {
+    "value": "Å"
+  },
+  "angleUnit": {
+    "value": "°"
   }
 }

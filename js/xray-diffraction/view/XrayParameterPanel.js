@@ -1,7 +1,7 @@
 // Copyright 2019-2020, University of Colorado Boulder
 
 /**
- * Shows the main controls, including frequency/wavelength and amplitude.
+ * Shows the major parameters, including frequency, wavelength, amplitude, path length difference, etc.
  *
  * @author Todd Holden (Queensborough Community College of CUNY)
  */
@@ -12,13 +12,18 @@
   import Property from '../../../../axon/js/Property.js';
   import RichText from '../../../../scenery/js/nodes/RichText.js';
   import Utils from '../../../../dot/js/Utils.js';
-
+  import xrayDiffractionStrings from '../../xrayDiffractionStrings.js';
   import xrayDiffraction from '../../xrayDiffraction.js';
 
   // strings
-  const wavelengthUnit = 'Å';
-  const angleUnit = '°';
-
+  const wavelengthUnitString = xrayDiffractionStrings.wavelengthUnit;
+  const angleUnitString = xrayDiffractionStrings.angleUnit;
+  const incidentAngleString = xrayDiffractionStrings.incidentAngle;
+  const wavelengthString = xrayDiffractionStrings.wavelength;
+  const aLatticeConstantString = xrayDiffractionStrings.aLatticeConstant;
+  const bLatticeConstantString = xrayDiffractionStrings.bLatticeConstant;
+  const distanceString = xrayDiffractionStrings.distance;
+  
   //constants
   //const ENERGY_FONT = new PhetFont( { size: 22, weight: 'bold' } );
   const INSET = 10;
@@ -51,14 +56,14 @@
       Property.multilink( [
         model.sourceAngleProperty,
         model.lattice.latticeConstantsP,
-        model.sourceWavelengthP
+        model.sourceWavelengthProperty
         ], () => {
-          angleText.text = 'Incident Angle = ' + Utils.toFixed( model.sourceAngleProperty.value * 180 / Math.PI, 1 ) + angleUnit;
-          latticeConstanstText.text = 'a = ' + Utils.toFixed( model.lattice.latticeConstantsP.value.x, 1 ) + wavelengthUnit +
-                                      '   b = d = ' + Utils.toFixed( model.lattice.latticeConstantsP.value.z, 1 ) + wavelengthUnit;
-          wavelengthText.text = 'Wavelength = ' + Utils.toFixed( model.sourceWavelengthP.value, 1 ) + wavelengthUnit;
-          _2dSinText.text = '2d sin(θ) = ' + Utils.toFixed( 2 * model.lattice.latticeConstantsP.value.z * Math.sin(model.sourceAngleProperty.value), 1 ) + wavelengthUnit;
-          _2dSinLambdaText.text = '2d sin(θ)/λ = ' + Utils.toFixed( 2 * model.lattice.latticeConstantsP.value.z * Math.sin(model.sourceAngleProperty.value) / model.sourceWavelengthP.value, 2 );
+          angleText.text = incidentAngleString + ' = ' + Utils.toFixed( model.sourceAngleProperty.value * 180 / Math.PI, 1 ) + angleUnitString;
+          latticeConstanstText.text = aLatticeConstantString + ' = ' + Utils.toFixed( model.lattice.latticeConstantsP.value.x, 1 ) + wavelengthUnitString +
+                             '   ' + bLatticeConstantString + ' = ' + distanceString + ' = ' + Utils.toFixed( model.lattice.latticeConstantsP.value.z, 1 ) + wavelengthUnitString;
+          wavelengthText.text = wavelengthString + ' = ' + Utils.toFixed( model.sourceWavelengthProperty.value, 1 ) + wavelengthUnitString;
+          _2dSinText.text = '2d sin(θ) = ' + Utils.toFixed( 2 * model.lattice.latticeConstantsP.value.z * Math.sin(model.sourceAngleProperty.value), 1 ) + wavelengthUnitString;
+          _2dSinLambdaText.text = '2d sin(θ)/λ = ' + Utils.toFixed( 2 * model.lattice.latticeConstantsP.value.z * Math.sin(model.sourceAngleProperty.value) / model.sourceWavelengthProperty.value, 2 );
         } );
       
       const content = new Node();
@@ -80,7 +85,7 @@
       _2dSinLambdaText.left = INSET;
       _2dSinLambdaText.top = _2dSinText.bottom + LABEL_SPACING;
 
-      super( content /*, options */ );
+      super( content, options );
     }
   }
 

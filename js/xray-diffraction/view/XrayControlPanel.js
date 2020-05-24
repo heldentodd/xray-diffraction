@@ -13,10 +13,20 @@
   import Panel from '../../../../sun/js/Panel.js';
   import RangeWithValue from '../../../../dot/js/RangeWithValue.js';
   import RichText from '../../../../scenery/js/nodes/RichText.js';
-  
+  import xrayDiffractionStrings from '../../xrayDiffractionStrings.js';
   import xrayDiffraction from '../../xrayDiffraction.js';
 
   // strings
+  const incidentAngleString = xrayDiffractionStrings.incidentAngle;
+  const wavelengthString = xrayDiffractionStrings.wavelength;
+  const horizontalRaysString = xrayDiffractionStrings.horizontalRays;
+  const verticalRaysString = xrayDiffractionStrings.verticalRays;
+  const aLatticeConstantString = xrayDiffractionStrings.aLatticeConstant;
+  const bLatticeConstantString = xrayDiffractionStrings.bLatticeConstant;
+  const animateString = xrayDiffractionStrings.animate;
+  const pathDifferenceString = xrayDiffractionStrings.pathDifference;
+  const showWavefrontsString = xrayDiffractionStrings.showWavefronts;
+  const showParametersString = xrayDiffractionStrings.showParameters;
   
   class XrayControlPanel extends Panel {
 
@@ -27,24 +37,24 @@
      */
     constructor( model ) {
 
-      const angleTitle = new RichText( 'Incident Angle' );
-      const wavelengthTitle = new RichText( 'Wavelength' );
-      const horizontalTitle = new RichText( 'Horizontal Rays' );
-      const verticalTitle = new RichText( 'Vertical Rays' );
-      const aLatticeTitle = new RichText( 'a' );
-      const bLatticeTitle = new RichText( 'b' );
+      const angleTitle = new RichText( incidentAngleString );
+      const wavelengthTitle = new RichText( wavelengthString );
+      const horizontalTitle = new RichText( horizontalRaysString );
+      const verticalTitle = new RichText( verticalRaysString );
+      const aLatticeTitle = new RichText( aLatticeConstantString );
+      const bLatticeTitle = new RichText( bLatticeConstantString );
       const angleControl = new HSlider( model.sourceAngleProperty, new RangeWithValue( 0 , Math.PI / 2 , Math.PI / 3 ) );
-      const wavelengthControl = new HSlider( model.sourceWavelengthP, new RangeWithValue( 1 , 20 , 5 ) );
-      const horizontalControl = new HSlider( model.horizontalRays, new RangeWithValue( 0 , 3.9 , 0 ) );
-      const verticalControl = new HSlider( model.verticalRays, new RangeWithValue( 1 , 7 , 2 ) );
+      const wavelengthControl = new HSlider( model.sourceWavelengthProperty, new RangeWithValue( 1 , 20 , 5 ) );
+      const horizontalControl = new HSlider( model.horizontalRaysProperty, new RangeWithValue( 0 , 3.9 , 0 ) );
+      const verticalControl = new HSlider( model.verticalRaysProperty, new RangeWithValue( 1 , 7 , 2 ) );
       const aLatticeControl = new HSlider( model.lattice.aConstantProperty, new RangeWithValue( 2 , 20 , 3.8 ) );
       const bLatticeControl = new HSlider( model.lattice.cConstantProperty, new RangeWithValue( 2 , 20 , 7.8   ) );
 
       //const pathDifferenceProperty = new BooleanProperty ( false );
-      const animateCheckbox = new Checkbox( new RichText('Animate'), model.animateProperty );
-      const pathDifferenceCheckbox = new Checkbox( new RichText('Path Difference'), model.pathDifferenceProperty );
-      const showWaveFrontsCheckbox = new Checkbox( new RichText('Show Wavefronts'), model.showWaveFrontsProperty );
-      const showParmsCheckbox = new Checkbox( new RichText(     'Show Parameters'), model.showParmsProperty );
+      const animateCheckbox = new Checkbox( new RichText(animateString), model.animateProperty );
+      const pathDifferenceCheckbox = new Checkbox( new RichText(pathDifferenceString), model.pathDifferenceProperty );
+      const showWaveFrontsCheckbox = new Checkbox( new RichText(showWavefrontsString), model.showWaveFrontsProperty );
+      const showParmsCheckbox = new Checkbox( new RichText( showParametersString ), model.showParmsProperty );
       
       const maxComponentWidth = _.max( [
         animateCheckbox.width,

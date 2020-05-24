@@ -1,9 +1,8 @@
 // Copyright 2020, University of Colorado Boulder
 
 /**
- * Model for a crystall lattice. A screen can have multiple graphs. Graphs should be subtypes.
- *
- * Graphs are responsible for:
+ * Model for a crystall lattice. 
+ * responsible for:
  *   - storing the lattice constants.
  *   - Keeping track of the angle (orientation) of the crystal.
  *
@@ -19,10 +18,8 @@
 
   //----------------------------------------------------------------------------------------
   // constants
+  const crystalSize = 20; // size of the crystal in Angstrom. Width and Height from the center
 
-  // comment for constants
-  //const SCREEN_VIEW_BOUNDS = VectorAdditionConstants.SCREEN_VIEW_BOUNDS;
-  
   class Lattice {
 
     /**
@@ -45,7 +42,7 @@
       this.latticeConstantsP = new DerivedProperty( [this.aConstantProperty, this.bConstantProperty, this.cConstantProperty ], combineConstants );
       
       // @public {number} the orientation in radians relative to the incoming light
-      this.orientationP =  new NumberProperty( orientation );
+      this.orientationProperty =  new NumberProperty( orientation );
 
       this.reciprocalBasis = new Vector3( 2 * Math.PI / latticeConstants.x , 2 * Math.PI / latticeConstants.y , 2 * Math.PI / latticeConstants.z);
   
@@ -61,7 +58,7 @@
     reset() {
       this.anglePhiProperty.reset();
       //this.latticeConstantsP.reset();
-      this.orientationP.reset();
+      this.orientationProperty.reset();
       this.aConstantProperty.reset();
       this.bConstantProperty.reset();
       this.cConstantProperty.reset();
@@ -82,15 +79,14 @@
       // should set above or in initialization file. Perhaps better to confine it to a shape.
       const aLattice = this.latticeConstantsP.get().x;
       const cLattice = this.latticeConstantsP.get().z;
-      const CrystalXMax = 20 / aLattice; // Must be at least 1 to have a three row lattice
-      const CrystalYMax = 20 / cLattice;
+      const crystalXMax = crystalSize / aLattice; // Must be at least 1 to have a three row lattice
+      const crystalYMax = crystalSize / cLattice;
 
-      const cosTheta = Math.cos(this.orientationP.get());
-      const sinTheta = Math.sin(this.orientationP.get());
-      //console.log(cosTheta, sinTheta);
-
+      const cosTheta = Math.cos(this.orientationProperty.get());
+      const sinTheta = Math.sin(this.orientationProperty.get());
+      
       let topRowSpacingHalf = 0;
-      if (Math.abs(cosTheta) > 0.7071068) {
+      if (Math.abs(cosTheta) > 0.7071068) { //sqrt(2) for a rectangular lattice to see which face is on top
         topRowSpacingHalf = aLattice * Math.abs(cosTheta) / 2;
       } else {
         topRowSpacingHalf = cLattice * Math.abs(sinTheta) / 2;
@@ -101,8 +97,8 @@
       const cCos = cLattice * cosTheta;
 
       this.sites.length = 0;
-      for( let x = 0; x <= CrystalXMax ; x++) {
-        for( let y = 0; y <= CrystalYMax ; y++) {
+      for( let x = 0; x <= crystalXMax ; x++) {
+        for( let y = 0; y <= crystalYMax ; y++) {
           const xSin = x * aSin;
           const xCos = x * aCos;
           const ySin = y * cSin;
@@ -111,6 +107,7 @@
           this.sites.push( new Vector2(-xCos - ySin , -xSin + yCos) );
           this.sites.push( new Vector2(-xCos + ySin , -xSin - yCos) );
           this.sites.push( new Vector2(ySin + xCos , xSin - yCos) );
+          
           //Find top, center atom and place it in sites[0]. sites[1,2,3] are all still the origin.
           //We only need to do this for max x and max y if we need to optimize. Could be separated out
           if((Math.abs(xCos - ySin) <= topRowSpacingHalf) && ((Math.abs(yCos - xSin) > this.sites[0].y))) {

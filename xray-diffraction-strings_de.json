@@ -1,18 +1,18 @@
 {
   "xray-diffraction.title": {
-    "value": "Xray Diffraction"
+    "value": "Röntgenbeugung"
   },
   "incidentAngle": {
-    "value": "Incident Angle"
+    "value": "Einfallswinkel"
   },
   "wavelength": {
-    "value": "Wavelength"
+    "value": "Wellenlänge"
   },
   "horizontalRays": {
-    "value": "Horizontal Rays"
+    "value": "Horizontale Strahlen"
   },
   "verticalRays": {
-    "value": "Vertical Rays"
+    "value": "Vertikale Strahlen"
   },
   "aLatticeConstant": {
     "value": "a"
@@ -21,28 +21,28 @@
     "value": "b"
   },
   "LatticeConstant": {
-    "value": "Lattice Constant"
+    "value": "Gitterkonstante"
   },
   "distance": {
     "value": "d"
   },
   "animate": {
-    "value": "Animate"
+    "value": "Animieren"
   },
   "pathDifference": {
-    "value": "Path Difference"
+    "value": "Pfadunterschied"
   },
   "showWavefronts": {
-    "value": "Show Wavefronts"
+    "value": "Wellenfronten anzeigen"
   },
   "showParameters": {
-    "value": "Show Parameters"
+    "value": "Parameter anzeigen"
   },
   "inPhase": {
     "value": "In Phase!"
   },
   "pathDifferenceEquals": {
-    "value": "Path Difference = "
+    "value": "Pfadunterschied = "
   },
   "wavelengthUnit": {
     "value": "Å"

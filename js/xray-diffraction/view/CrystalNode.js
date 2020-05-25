@@ -16,7 +16,7 @@
   // constants
   const RADIUS = 5;   //Atomic Nucleus Radius
   const DIMENSION_ARROW_OPTIONS = { fill: 'black', stroke: null, tailWidth: 2, headWidth: 7, headHeight: 20, doubleHead: true };
-  const ScaleF = 5;
+  const ScaleF = 8;
   
   class CrystalNode extends Node {
     /**

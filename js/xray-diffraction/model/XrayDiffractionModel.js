@@ -25,7 +25,7 @@ class XrayDiffractionModel {
     assert && assert( tandem instanceof Tandem, 'invalid tandem' );
     
        // @protected - used to signal when a sim step has occurred
-       this.stepEmitter = new Emitter( { validators: [ { valueType: 'number' } ] } );
+       this.stepEmitter = new Emitter( { parameters: [ { valueType: 'number' } ] } );
   
        this.lattice = new Lattice ( new Vector3( 3.82, 3.89, 7.8 ) , 0 );
        this.sourceAngleProperty = new NumberProperty( Math.PI / 3 );

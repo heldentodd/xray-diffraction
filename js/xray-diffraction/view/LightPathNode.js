@@ -76,7 +76,7 @@
                                                  (firstWaveFrontLength - i * wavelength) * sinTheta );
           this.addChild( new Path( Shape.lineSegment( startPoint.minus(waveFrontPosition).plus(waveFrontAmp),
                                                       startPoint.minus(waveFrontPosition).minus(waveFrontAmp)), {
-            stroke: 'hsl('+ 60 * i +', 100%, 50%)',
+            stroke: 'hsl('+ ((60 * i % 360) + 360 ) % 360 +', 100%, 50%)',
             lineWidth: 3
           } ) );
         }

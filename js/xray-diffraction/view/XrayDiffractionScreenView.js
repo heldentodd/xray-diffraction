@@ -18,7 +18,6 @@ import CrystalNode from './CrystalNode.js';
 import DragListener from '../../../../scenery/js/listeners/DragListener.js';
 import LightPathNode from './LightPathNode.js';
 import MeasuringTapeNode from '../../../../scenery-phet/js/MeasuringTapeNode.js';
-import MovableDragHandler from '../../../../scenery-phet/js/input/MovableDragHandler.js';
 import Node from '../../../../scenery/js/nodes/Node.js';
 import Panel from '../../../../sun/js/Panel.js';
 import Path from '../../../../scenery/js/nodes/Path.js';
@@ -26,10 +25,10 @@ import Property from '../../../../axon/js/Property.js';
 import ProtractorNode from './ProtractorNode.js';
 import RichText from '../../../../scenery/js/nodes/RichText.js';
 import Shape from '../../../../kite/js/Shape.js';
-import ToolIconListener from './ToolIconListener.js';
 import Utils from '../../../../dot/js/Utils.js';
 import VBox from '../../../../scenery/js/nodes/VBox.js';
 import Vector2 from '../../../../dot/js/Vector2.js';
+import Vector2Property from '../../../../dot/js/Vector2Property.js';
 import XrayControlPanel from './XrayControlPanel.js';
 import XrayParameterPanel from './XrayParameterPanel.js';
 
@@ -68,7 +67,6 @@ class XrayDiffractionScreenView extends ScreenView {
     model.sourceAngleProperty.changedEmitter.addListener( () => {
         this.redrawLight(model, this.crystalNode);
     } );
-
 
     const inPhaseText = new RichText( '', { maxWidth: 400 } );
     this.addChild( inPhaseText );
@@ -141,39 +139,34 @@ class XrayDiffractionScreenView extends ScreenView {
     } );
 
     // create the protractor node
-    this.showProtractorProperty = new Property( false );
-    const protractorNodeIcon = new ProtractorNode( this.showProtractorProperty, false, { scale: 0.24 } );
-    protractorNodeIcon.mouseArea = Shape.bounds( protractorNodeIcon.localBounds );
-    protractorNodeIcon.touchArea = Shape.bounds( protractorNodeIcon.localBounds );
-    this.showProtractorProperty.link( showProtractor => { protractorNodeIcon.visible = !showProtractor; } );
+    const showProtractorProperty = new BooleanProperty( false );
+    const protractorNode = new ProtractorNode( showProtractorProperty, true, { scale: 0.8 } );
+    const protractorPositionProperty = new Vector2Property( protractorNode.center );
+    showProtractorProperty.linkAttribute( protractorNode, 'visible' );
 
-    const protractorNode = new ProtractorNode( this.showProtractorProperty, false, { scale: 0.8 } );
-    const protractorPosition = new Vector2( protractorNode.centerX, protractorNode.centerY );
-    const protractorPositionProperty = new Property( protractorPosition );
+    const protractorNodeIcon = new ProtractorNode( showProtractorProperty, false, { scale: 0.24 } );
+    showProtractorProperty.link( showProtractor => { protractorNodeIcon.visible = !showProtractor; } );
 
-    const protractorNodeListener = new MovableDragHandler( protractorPositionProperty, {
-      endDrag: () => { if ( protractorNode.getGlobalBounds().intersectsBounds( this.toolbox.getGlobalBounds() ) ) {
-        this.showProtractorProperty.value = false;
+    const protractorNodeListener = new DragListener( {
+      positionProperty: protractorPositionProperty,
+      useParentOffset: true,
+      end: () => { if ( protractorNode.getGlobalBounds().intersectsBounds( this.toolbox.getGlobalBounds() ) ) {
+        showProtractorProperty.value = false;
       } }
     } );
-
-    // Add an input listener to the toolbox icon for the protractor, which forwards events to the MovableDragHander
-    // for the node in the play area
-    protractorNodeIcon.addInputListener( new ToolIconListener( [ protractorNodeListener ], event => {
-      // Show the protractor in the play area and hide the icon
-      this.showProtractorProperty.value = true;
-
-      // Center the protractor on the pointer
-      protractorPositionProperty.value = protractorNode.globalToParentPoint( event.pointer.point );
-    } ) );
-
-    this.showProtractorProperty.linkAttribute( protractorNode, 'visible' );
+    protractorNode.addInputListener( protractorNodeListener );
 
     protractorPositionProperty.link( protractorPosition => {
       protractorNode.center = protractorPosition;
     } );
 
-    protractorNode.addInputListener( protractorNodeListener );
+    // Initialize the protractor icon and set up the first drag off the toolbox
+    initializeIcon( protractorNodeIcon, showProtractorProperty, event => {
+      // Center the protractor on the pointer
+      protractorPositionProperty.value = protractorNode.globalToParentPoint( event.pointer.point );
+      protractorNodeListener.press( event );
+      showProtractorProperty.value = true;
+    } );
 
     // add tape measure
     const measuringTapeProperty = new Property( {name: 'Å', multiplier: 0.125} );
@@ -182,10 +175,8 @@ class XrayDiffractionScreenView extends ScreenView {
       // translucent white background, same value as in Projectile Motion, see https://github.com/phetsims/projectile-motion/issues/156
       textBackgroundColor: 'rgba( 255, 255, 255, 0.6 )',
       textColor: 'black',
-      basePositionProperty: new Property( new Vector2( 100, 100 ) ),
-      tipPositionProperty:  new Property( new Vector2( 140, 100 ) ),
-
-    // baseDragStarted: () => { grabSound.play(); },
+      basePositionProperty: new Vector2Property( new Vector2( 100, 100 ) ),
+      tipPositionProperty:  new Vector2Property( new Vector2( 140, 100 ) ),
 
       // Drop in toolbox
       baseDragEnded: () => {
@@ -225,7 +216,7 @@ class XrayDiffractionScreenView extends ScreenView {
       xMargin: 10,
       yMargin: 10,
       stroke: '#696969',
-      lineWidth: 1.5, fill: '#EEEEEE',
+      lineWidth: 1.5, fill: '#eeeeee',
       left: this.layoutBounds.minX + XrayDiffractionConstants.SCREEN_VIEW_X_MARGIN,
       bottom: this.layoutBounds.maxY - XrayDiffractionConstants.SCREEN_VIEW_Y_MARGIN
     } );
@@ -246,6 +237,11 @@ class XrayDiffractionScreenView extends ScreenView {
         this.crystalNode.centerY = 450;
         this.addChild( this.crystalNode );
         this.redrawLight(model, this.crystalNode);
+        showProtractorProperty.reset();
+        protractorNode.reset();
+        isMeasuringTapeInPlayAreaProperty.value = false;
+        measuringTapeNode.visible = false;
+        measuringTapeNode.reset();
       },
       right: this.layoutBounds.maxX - XrayDiffractionConstants.SCREEN_VIEW_X_MARGIN,
       bottom: this.layoutBounds.maxY - XrayDiffractionConstants.SCREEN_VIEW_Y_MARGIN,

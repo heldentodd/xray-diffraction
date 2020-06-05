@@ -20,7 +20,7 @@
   "bLatticeConstant": {
     "value": "b"
   },
-  "distance": {
+  "interplaneDistance": {
     "value": "d"
   },
   "animate": {

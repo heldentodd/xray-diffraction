@@ -22,7 +22,7 @@
   const wavelengthString = xrayDiffractionStrings.wavelength;
   const aLatticeConstantString = xrayDiffractionStrings.aLatticeConstant;
   const bLatticeConstantString = xrayDiffractionStrings.bLatticeConstant;
-  const distanceString = xrayDiffractionStrings.distance;
+  const interplaneDistanceString = xrayDiffractionStrings.interplaneDistance;
   
   //constants
   //const ENERGY_FONT = new PhetFont( { size: 22, weight: 'bold' } );
@@ -59,11 +59,14 @@
         model.sourceWavelengthProperty
         ], () => {
           angleText.text = incidentAngleString + ' = ' + Utils.toFixed( model.sourceAngleProperty.value * 180 / Math.PI, 1 ) + angleUnitString;
-          latticeConstanstText.text = aLatticeConstantString + ' = ' + Utils.toFixed( model.lattice.latticeConstantsP.value.x, 1 ) + wavelengthUnitString +
-                             '   ' + bLatticeConstantString + ' = ' + distanceString + ' = ' + Utils.toFixed( model.lattice.latticeConstantsP.value.z, 1 ) + wavelengthUnitString;
+          latticeConstanstText.text = aLatticeConstantString + ' = ' + Utils.toFixed( model.lattice.latticeConstantsP.value.x, 1 )
+                                      + wavelengthUnitString + '   ' + bLatticeConstantString + ' = ' + interplaneDistanceString + ' = '
+                                      + Utils.toFixed( model.lattice.latticeConstantsP.value.z, 1 ) + wavelengthUnitString;
           wavelengthText.text = wavelengthString + ' = ' + Utils.toFixed( model.sourceWavelengthProperty.value, 1 ) + wavelengthUnitString;
-          _2dSinText.text = '2d sin(θ) = ' + Utils.toFixed( 2 * model.lattice.latticeConstantsP.value.z * Math.sin(model.sourceAngleProperty.value), 1 ) + wavelengthUnitString;
-          _2dSinLambdaText.text = '2d sin(θ)/λ = ' + Utils.toFixed( 2 * model.lattice.latticeConstantsP.value.z * Math.sin(model.sourceAngleProperty.value) / model.sourceWavelengthProperty.value, 2 );
+          _2dSinText.text = '2' + interplaneDistanceString + ' sin(θ) = ' +
+                            Utils.toFixed( 2 * model.lattice.latticeConstantsP.value.z * Math.sin(model.sourceAngleProperty.value), 1 ) + wavelengthUnitString;
+          _2dSinLambdaText.text = '2' + interplaneDistanceString + ' sin(θ)/λ = ' +
+                                  Utils.toFixed( 2 * model.lattice.latticeConstantsP.value.z * Math.sin(model.sourceAngleProperty.value) / model.sourceWavelengthProperty.value, 2 );
         } );
       
       const content = new Node();

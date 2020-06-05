@@ -33,7 +33,7 @@ import XrayControlPanel from './XrayControlPanel.js';
 import XrayParameterPanel from './XrayParameterPanel.js';
 
 //strings
-const distanceString = xrayDiffractionStrings.distance;
+const interplaneDistanceString = xrayDiffractionStrings.interplaneDistance;
 const inPhaseString = xrayDiffractionStrings.inPhase;
 const pathDifferenceEqualsString = xrayDiffractionStrings.pathDifferenceEquals;
   
@@ -324,7 +324,7 @@ class XrayDiffractionScreenView extends ScreenView {
       const pLDLabelCenter = pLDArrowStart.plusXY(5 * Math.sin(theta) - (dSinTheta * Math.cos(theta))/2 , 5 * Math.cos(theta) + (dSinTheta * Math.sin(theta))/2 );
       const pLDDimensionArrow = new ArrowNode( pLDArrowStart.x , pLDArrowStart.y , pLDArrowEnd.x , pLDArrowEnd.y , DIMENSION_ARROW_OPTIONS );
       this.lightPathsNode.addChild( pLDDimensionArrow );
-      const pLDDimensionLabel = new RichText( distanceString + '<i>sin</i>(θ)', { maxWidth: 400, left: pLDLabelCenter.x, centerY: pLDLabelCenter.y } );
+      const pLDDimensionLabel = new RichText( interplaneDistanceString + '<i>sin</i>(θ)', { maxWidth: 400, left: pLDLabelCenter.x, centerY: pLDLabelCenter.y } );
       this.lightPathsNode.addChild( pLDDimensionLabel );
     }
   

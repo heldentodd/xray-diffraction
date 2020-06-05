@@ -12,8 +12,14 @@
   import RadialGradient from '../../../../scenery/js/util/RadialGradient.js';
   import RichText from '../../../../scenery/js/nodes/RichText.js';
   import xrayDiffraction from '../../xrayDiffraction.js';
+  import xrayDiffractionStrings from '../../xrayDiffractionStrings.js';
 
-  // constants
+  // strings
+  const aLatticeConstantString = xrayDiffractionStrings.aLatticeConstant;
+  const bLatticeConstantString = xrayDiffractionStrings.bLatticeConstant;
+  const interplaneDistanceString = xrayDiffractionStrings.interplaneDistance;
+
+// constants
   const RADIUS = 5;   //Atomic Nucleus Radius
   const DIMENSION_ARROW_OPTIONS = { fill: 'black', stroke: null, tailWidth: 2, headWidth: 7, headHeight: 20, doubleHead: true };
   const ScaleF = 8;
@@ -53,13 +59,13 @@
       this.addChild( aDimensionArrow );
       this.addChild( bDimensionArrow );
       this.addChild( dDimensionArrow );
-      const aDimensionLabel = new RichText( 'a', { maxWidth: 400, centerX: aDimensionArrow.centerX, top: aDimensionArrow.centerY } );
-      const bDimensionLabel = new RichText( 'b', { maxWidth: 400, centerY: bDimensionArrow.centerY, right: bDimensionArrow.centerX - 5 } );
-      const dDimensionLabel = new RichText( 'd', { maxWidth: 400, centerY: dDimensionArrow.centerY, right: dDimensionArrow.centerX - 5 } );
+      const aDimensionLabel = new RichText( aLatticeConstantString, { maxWidth: 400, centerX: aDimensionArrow.centerX, top: aDimensionArrow.centerY } );
+      const bDimensionLabel = new RichText( bLatticeConstantString, { maxWidth: 400, centerY: bDimensionArrow.centerY, right: bDimensionArrow.centerX - 5 } );
+      const dDimensionLabel = new RichText( interplaneDistanceString, { maxWidth: 400, centerY: dDimensionArrow.centerY, right: dDimensionArrow.centerX - 5 } );
       
       // fake labels to keep field centered
-      const fakeLabel1 = new RichText( 'd', { fill: 'white', width: dDimensionLabel.width, centerY: dDimensionArrow.centerY, left: - dDimensionArrow.centerX + 5 } );
-      const fakeLabel2 = new RichText( 'a', { fill: 'white', width: dDimensionLabel.width, centerX: aDimensionArrow.centerX, bottom: - aDimensionArrow.centerY } );
+      const fakeLabel1 = new RichText( interplaneDistanceString, { fill: 'white', width: dDimensionLabel.width, centerY: dDimensionArrow.centerY, left: - dDimensionArrow.centerX + 5 } );
+      const fakeLabel2 = new RichText( aLatticeConstantString, { fill: 'white', width: dDimensionLabel.width, centerX: aDimensionArrow.centerX, bottom: - aDimensionArrow.centerY } );
       this.addChild( aDimensionLabel );
       this.addChild( bDimensionLabel );
       this.addChild( dDimensionLabel );

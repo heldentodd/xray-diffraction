@@ -27,22 +27,23 @@
   const pathDifferenceString = xrayDiffractionStrings.pathDifference;
   const showWavefrontsString = xrayDiffractionStrings.showWavefronts;
   const showParametersString = xrayDiffractionStrings.showParameters;
+
+  // constants
+  const textOptions = {  maxWidth: 200 };
   
   class XrayControlPanel extends Panel {
 
     /**
-     * @param {WavesModel} model
-     * @param {AlignGroup} alignGroup
-     * @param {Object} [options]
+     * @param {Object} model
      */
     constructor( model ) {
 
-      const angleTitle = new RichText( incidentAngleString );
-      const wavelengthTitle = new RichText( wavelengthString );
-      const horizontalTitle = new RichText( horizontalRaysString );
-      const verticalTitle = new RichText( verticalRaysString );
-      const aLatticeTitle = new RichText( aLatticeConstantString );
-      const bLatticeTitle = new RichText( bLatticeConstantString );
+      const angleTitle = new RichText( incidentAngleString, textOptions );
+      const wavelengthTitle = new RichText( wavelengthString, textOptions );
+      const horizontalTitle = new RichText( horizontalRaysString, textOptions );
+      const verticalTitle = new RichText( verticalRaysString, textOptions );
+      const aLatticeTitle = new RichText( aLatticeConstantString, textOptions );
+      const bLatticeTitle = new RichText( bLatticeConstantString, textOptions );
       const angleControl = new HSlider( model.sourceAngleProperty, new RangeWithValue( 0 , Math.PI / 2 , Math.PI / 3 ) );
       const wavelengthControl = new HSlider( model.sourceWavelengthProperty, new RangeWithValue( 1 , 20 , 5 ) );
       const horizontalControl = new HSlider( model.horizontalRaysProperty, new RangeWithValue( 0 , 3.9 , 0 ) );
@@ -50,11 +51,10 @@
       const aLatticeControl = new HSlider( model.lattice.aConstantProperty, new RangeWithValue( 2 , 20 , 3.8 ) );
       const bLatticeControl = new HSlider( model.lattice.cConstantProperty, new RangeWithValue( 2 , 20 , 7.8   ) );
 
-      //const pathDifferenceProperty = new BooleanProperty ( false );
-      const animateCheckbox = new Checkbox( new RichText(animateString), model.animateProperty );
-      const pathDifferenceCheckbox = new Checkbox( new RichText(pathDifferenceString), model.pathDifferenceProperty );
-      const showWaveFrontsCheckbox = new Checkbox( new RichText(showWavefrontsString), model.showWaveFrontsProperty );
-      const showParmsCheckbox = new Checkbox( new RichText( showParametersString ), model.showParmsProperty );
+      const animateCheckbox = new Checkbox( new RichText( animateString, textOptions ), model.animateProperty );
+      const pathDifferenceCheckbox = new Checkbox( new RichText( pathDifferenceString, textOptions ), model.pathDifferenceProperty );
+      const showWaveFrontsCheckbox = new Checkbox( new RichText( showWavefrontsString, textOptions ), model.showWaveFrontsProperty );
+      const showParmsCheckbox = new Checkbox( new RichText( showParametersString, textOptions ), model.showParmsProperty );
       
       const maxComponentWidth = _.max( [
         animateCheckbox.width,

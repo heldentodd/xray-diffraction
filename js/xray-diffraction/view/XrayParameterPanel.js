@@ -25,7 +25,7 @@
   const interplaneDistanceString = xrayDiffractionStrings.interplaneDistance;
   
   //constants
-  //const ENERGY_FONT = new PhetFont( { size: 22, weight: 'bold' } );
+  const textOptions = {  maxWidth: 200 };
   const INSET = 10;
   const LABEL_SPACING = 5;
   
@@ -33,7 +33,7 @@
   class XrayParameterPanel extends Panel {
 
     /**
-     * @param {WavesModel} model
+     * @param {Object} model
      * @param {Object} [options]
      */
     constructor( model, options ) {
@@ -46,11 +46,11 @@
       }, options );
 
       // Text nodes that reflects the incident angle, lattice parameters, wavelength, 2dsin(Theta), and 2dsin(Theta)/wavelength
-      const angleText = new RichText( '?', { /*font: ENERGY_FONT, fill: Color.BLACK */  maxWidth: 400 } );
-      const latticeConstanstText = new RichText( '?', { maxWidth: 400 } );
-      const wavelengthText = new RichText( '?', { maxWidth: 400 } );
-      const _2dSinText = new RichText( '?', { maxWidth: 400 } );
-      const _2dSinLambdaText = new RichText( '?', { maxWidth: 400 } );
+      const angleText = new RichText( '?', textOptions );
+      const latticeConstanstText = new RichText( '?', textOptions );
+      const wavelengthText = new RichText( '?', textOptions );
+      const _2dSinText = new RichText( '?', textOptions );
+      const _2dSinLambdaText = new RichText( '?', textOptions );
      
       // Links the current incident angle, lattice parameters, wavelength, 2dsin(Theta), and 2dsin(Theta)/wavelength to the text variables declared above
       Property.multilink( [

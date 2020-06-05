@@ -26,7 +26,7 @@
   
   class CrystalNode extends Node {
     /**
-     * @param {Array of Vector2} lattice - Array of points for the crystal lattice
+     * @param { [  ] } lattice - Array of Vector2 points for the crystal lattice
      */
     constructor( lattice ) {
 
@@ -59,13 +59,13 @@
       this.addChild( aDimensionArrow );
       this.addChild( bDimensionArrow );
       this.addChild( dDimensionArrow );
-      const aDimensionLabel = new RichText( aLatticeConstantString, { maxWidth: 400, centerX: aDimensionArrow.centerX, top: aDimensionArrow.centerY } );
-      const bDimensionLabel = new RichText( bLatticeConstantString, { maxWidth: 400, centerY: bDimensionArrow.centerY, right: bDimensionArrow.centerX - 5 } );
-      const dDimensionLabel = new RichText( interplaneDistanceString, { maxWidth: 400, centerY: dDimensionArrow.centerY, right: dDimensionArrow.centerX - 5 } );
+      const aDimensionLabel = new RichText( aLatticeConstantString, { maxWidth: 100, centerX: aDimensionArrow.centerX, top: aDimensionArrow.centerY } );
+      const bDimensionLabel = new RichText( bLatticeConstantString, { maxWidth: 100, centerY: bDimensionArrow.centerY, right: bDimensionArrow.centerX - 5 } );
+      const dDimensionLabel = new RichText( interplaneDistanceString, { maxWidth: 100, centerY: dDimensionArrow.centerY, right: dDimensionArrow.centerX - 5 } );
       
       // fake labels to keep field centered
-      const fakeLabel1 = new RichText( interplaneDistanceString, { fill: 'white', width: dDimensionLabel.width, centerY: dDimensionArrow.centerY, left: - dDimensionArrow.centerX + 5 } );
-      const fakeLabel2 = new RichText( aLatticeConstantString, { fill: 'white', width: dDimensionLabel.width, centerX: aDimensionArrow.centerX, bottom: - aDimensionArrow.centerY } );
+      const fakeLabel1 = new RichText( interplaneDistanceString, { fill: 'white', maxWidth: 100, centerY: dDimensionArrow.centerY, left: - dDimensionArrow.centerX + 5 } );
+      const fakeLabel2 = new RichText( aLatticeConstantString, { fill: 'white', maxWidth: 100, centerX: aDimensionArrow.centerX, bottom: - aDimensionArrow.centerY } );
       this.addChild( aDimensionLabel );
       this.addChild( bDimensionLabel );
       this.addChild( dDimensionLabel );

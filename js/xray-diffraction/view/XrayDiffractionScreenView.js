@@ -68,7 +68,7 @@ class XrayDiffractionScreenView extends ScreenView {
         this.redrawLight(model, this.crystalNode);
     } );
 
-    const inPhaseText = new RichText( '', { maxWidth: 400 } );
+    const inPhaseText = new RichText( '', { maxWidth: 260 } );
     this.addChild( inPhaseText );
       
     model.pLDWavelengthsProperty.changedEmitter.addListener( () => {
@@ -324,7 +324,7 @@ class XrayDiffractionScreenView extends ScreenView {
       const pLDLabelCenter = pLDArrowStart.plusXY(5 * Math.sin(theta) - (dSinTheta * Math.cos(theta))/2 , 5 * Math.cos(theta) + (dSinTheta * Math.sin(theta))/2 );
       const pLDDimensionArrow = new ArrowNode( pLDArrowStart.x , pLDArrowStart.y , pLDArrowEnd.x , pLDArrowEnd.y , DIMENSION_ARROW_OPTIONS );
       this.lightPathsNode.addChild( pLDDimensionArrow );
-      const pLDDimensionLabel = new RichText( interplaneDistanceString + '<i>sin</i>(θ)', { maxWidth: 400, left: pLDLabelCenter.x, centerY: pLDLabelCenter.y } );
+      const pLDDimensionLabel = new RichText( interplaneDistanceString + '<i>sin</i>(θ)', { maxWidth: 200, left: pLDLabelCenter.x, centerY: pLDLabelCenter.y } );
       this.lightPathsNode.addChild( pLDDimensionLabel );
     }
   

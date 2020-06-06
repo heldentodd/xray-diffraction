@@ -4,14 +4,14 @@
  * @author Todd Holden (Queensborough Community College of CUNY)
  */
 
-import Tandem from '../../../../tandem/js/Tandem.js';
 import BooleanProperty from '../../../../axon/js/BooleanProperty.js';
 import DerivedProperty from '../../../../axon/js/DerivedProperty.js';
 import Emitter from '../../../../axon/js/Emitter.js';
-import Lattice from './Lattice.js';
 import NumberProperty from '../../../../axon/js/NumberProperty.js';
 import Vector3 from '../../../../dot/js/Vector3.js';
+import Tandem from '../../../../tandem/js/Tandem.js';
 import xrayDiffraction from '../../xrayDiffraction.js';
+import Lattice from './Lattice.js';
 
 /**
  * @constructor
@@ -23,24 +23,24 @@ class XrayDiffractionModel {
    */
   constructor( tandem ) {
     assert && assert( tandem instanceof Tandem, 'invalid tandem' );
-    
-       // @protected - used to signal when a sim step has occurred
-       this.stepEmitter = new Emitter( { parameters: [ { valueType: 'number' } ] } );
-  
-       this.lattice = new Lattice ( new Vector3( 3.82, 3.89, 7.8 ) , 0 );
-       this.sourceAngleProperty = new NumberProperty( Math.PI / 3 );
-       this.sourceWavelengthProperty = new NumberProperty( 8 );
-       this.horizontalRaysProperty = new NumberProperty( 0 );
-       this.verticalRaysProperty = new NumberProperty( 2 );
-       this.animateProperty = new BooleanProperty( false );
-       this.pathDifferenceProperty = new BooleanProperty( false );
-       this.showParmsProperty = new BooleanProperty( false );
-       this.showWaveFrontsProperty = new BooleanProperty( false );
 
-       this.pLDProperty = new DerivedProperty( [this.lattice.latticeConstantsProperty, this.sourceAngleProperty ], computePLD );
-       this.pLDWavelengthsProperty = new DerivedProperty( [this.pLDProperty, this.sourceWavelengthProperty], computePLDWavelengths );
+    // @protected - used to signal when a sim step has occurred
+    this.stepEmitter = new Emitter( { parameters: [ { valueType: 'number' } ] } );
 
-       this.startPhase = 0 ;
+    this.lattice = new Lattice( new Vector3( 3.82, 3.89, 7.8 ), 0 );
+    this.sourceAngleProperty = new NumberProperty( Math.PI / 3 );
+    this.sourceWavelengthProperty = new NumberProperty( 8 );
+    this.horizontalRaysProperty = new NumberProperty( 0 );
+    this.verticalRaysProperty = new NumberProperty( 2 );
+    this.animateProperty = new BooleanProperty( false );
+    this.pathDifferenceProperty = new BooleanProperty( false );
+    this.showParmsProperty = new BooleanProperty( false );
+    this.showWaveFrontsProperty = new BooleanProperty( false );
+
+    this.pLDProperty = new DerivedProperty( [ this.lattice.latticeConstantsProperty, this.sourceAngleProperty ], computePLD );
+    this.pLDWavelengthsProperty = new DerivedProperty( [ this.pLDProperty, this.sourceWavelengthProperty ], computePLDWavelengths );
+
+    this.startPhase = 0;
   }
 
   /**
@@ -57,7 +57,7 @@ class XrayDiffractionModel {
     this.showParmsProperty.reset();
     this.showWaveFrontsProperty.reset();
     this.lattice.reset();
-    this.startPhase = 0 ;
+    this.startPhase = 0;
   }
 
   /**
@@ -75,7 +75,7 @@ class XrayDiffractionModel {
    * @public
    */
   step( dt ) {
-    if (this.animateProperty.value) {
+    if ( this.animateProperty.value ) {
       this.startPhase = this.startPhase - 3 * dt;
       this.stepEmitter.emit( dt );
     }
@@ -83,11 +83,11 @@ class XrayDiffractionModel {
 }
 
 function computePLD( constants, theta ) {
-  return 2 * constants.z * Math.sin(theta);
+  return 2 * constants.z * Math.sin( theta );
 }
 
 function computePLDWavelengths( pLD, wavelength ) {
-  return pLD/wavelength;
+  return pLD / wavelength;
 }
 
 xrayDiffraction.register( 'XrayDiffractionModel', XrayDiffractionModel );

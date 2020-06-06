@@ -9,8 +9,8 @@
 import Sim from '../../joist/js/Sim.js';
 import simLauncher from '../../joist/js/simLauncher.js';
 import Tandem from '../../tandem/js/Tandem.js';
-import xrayDiffractionStrings from './xrayDiffractionStrings.js';
 import XrayDiffractionScreen from './xray-diffraction/XrayDiffractionScreen.js';
+import xrayDiffractionStrings from './xrayDiffractionStrings.js';
 
 const xrayDiffractionTitleString = xrayDiffractionStrings[ 'xray-diffraction' ].title;
 

@@ -173,7 +173,7 @@ class XrayDiffractionScreenView extends ScreenView {
     const measuringTapeNode = new MeasuringTapeNode( measuringTapeProperty, new BooleanProperty( true ), {
 
       // translucent white background, same value as in Projectile Motion, see https://github.com/phetsims/projectile-motion/issues/156
-      textBackgroundColor: 'rgba( 255, 255, 255, 0.6 )',
+      textBackgroundColor: 'rgba(255,255,255,0.6)',
       textColor: 'black',
       basePositionProperty: new Vector2Property( new Vector2( 100, 100 ) ),
       tipPositionProperty:  new Vector2Property( new Vector2( 140, 100 ) ),
@@ -321,27 +321,33 @@ class XrayDiffractionScreenView extends ScreenView {
       //add d sin(θ) and dimension arrow
       const pLDArrowStart = lineStart.plusXY((5 + AMP + raySeparation) * Math.sin(theta), (5 + AMP + raySeparation) * Math.cos(theta));
       const pLDArrowEnd = pLDArrowStart.plusXY( - dSinTheta * Math.cos(theta) , dSinTheta * Math.sin(theta) );
-      const pLDLabelCenter = pLDArrowStart.plusXY(5 * Math.sin(theta) - (dSinTheta * Math.cos(theta))/2 , 5 * Math.cos(theta) + (dSinTheta * Math.sin(theta))/2 );
+      const pLDLabelCenter = pLDArrowStart.plusXY(5 * Math.sin(theta) - (dSinTheta * Math.cos(theta))/2 ,
+        5 * Math.cos(theta) + (dSinTheta * Math.sin(theta))/2 );
       const pLDDimensionArrow = new ArrowNode( pLDArrowStart.x , pLDArrowStart.y , pLDArrowEnd.x , pLDArrowEnd.y , DIMENSION_ARROW_OPTIONS );
       this.lightPathsNode.addChild( pLDDimensionArrow );
-      const pLDDimensionLabel = new RichText( interplaneDistanceString + '<i>sin</i>(θ)', { maxWidth: 200, left: pLDLabelCenter.x, centerY: pLDLabelCenter.y } );
+      const pLDDimensionLabel = new RichText( interplaneDistanceString + '<i>sin</i>(θ)',
+        { maxWidth: 200, left: pLDLabelCenter.x, centerY: pLDLabelCenter.y } );
       this.lightPathsNode.addChild( pLDDimensionLabel );
     }
   
   // Main logic to draw the light rays
-    const horiz = Math.floor ( Math.min( model.horizontalRaysProperty.get() ,  20 / model.lattice.latticeConstantsP.get().x  ) );
-    const vert = Math.min ( Math.floor( model.verticalRaysProperty.get() ) , 1 + 2 * Math.floor( 20 / model.lattice.latticeConstantsP.get().z ) );
+    const horiz = Math.floor (Math.min(model.horizontalRaysProperty.get(), 20/model.lattice.latticeConstantsP.get().x));
+    const vert = Math.min ( Math.floor( model.verticalRaysProperty.get() ) ,
+      1 + 2 * Math.floor( 20 / model.lattice.latticeConstantsP.get().z ) );
     for (let i = - horiz; i <= horiz; i++) {
       for (let j = 0; j < vert; j++) {
-        const shift = new Vector2( scaleF * i * model.lattice.latticeConstantsP.get().x, - scaleF * j * model.lattice.latticeConstantsP.get().z );
-        const distance = scaleF * (i * model.lattice.latticeConstantsP.get().x * Math.sin(theta) + j * model.lattice.latticeConstantsP.get().z * Math.cos(theta));
+        const shift = new Vector2( scaleF * i * model.lattice.latticeConstantsP.get().x,
+          - scaleF * j * model.lattice.latticeConstantsP.get().z );
+        const distance = scaleF * (i * model.lattice.latticeConstantsP.get().x * Math.sin(theta)
+                                   + j * model.lattice.latticeConstantsP.get().z * Math.cos(theta));
         const incidentRayStart = new Vector2(incidentRay1Start.x - distance * Math.sin(theta),
                                              incidentRay1Start.y + distance * Math.cos(theta));
         const incidentRayEnd = incidentRay1End.minus(shift);
         const incidentRayLength = incidentRayEnd.minus(incidentRayStart).getMagnitude();
         const exitRayPhase = (incidentRayLength / lamda /*- Math.floor(incidentRayLength / lamda)*/) * 2 * Math.PI + model.startPhase;
         const extraLength = 2 * scaleF * Math.cos(theta) * i * model.lattice.latticeConstantsP.get().x;
-        const exitRayEnd = new Vector2(2 * incidentRayEnd.x - incidentRayStart.x + extraLength * Math.cos(theta), incidentRayStart.y - extraLength * Math.sin(theta));
+        const exitRayEnd = new Vector2(2 * incidentRayEnd.x - incidentRayStart.x + extraLength * Math.cos(theta),
+          incidentRayStart.y - extraLength * Math.sin(theta));
         this.lightPathsNode.addChild( new LightPathNode ( incidentRayStart , incidentRayEnd , scaleF * model.sourceWavelengthProperty.get(), {
           amplitude: AMP,
           startPhase: model.startPhase,

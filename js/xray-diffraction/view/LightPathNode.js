@@ -23,10 +23,14 @@
      * @param {number} wavelength - wavelength of beam, units??
      */
     constructor( startPoint, endPoint, wavelength, options ) {
+
       options = merge( {
         amplitude: 10,  // amplitude of the wave. Might be better to have default amplitude: (endPoint - startPoint)/10
         startPhase: 0, // initial phase of the wave (0 for cosine wave)
-        waveFrontWidth: 0 // 0 for no wavefronts
+        waveFrontWidth: 0, // 0 for no wavefronts
+        stroke: 'black', // color of sine wave
+        centerStroke: 'gray', // color of dashed baseline
+        lineWidth: 2  // width of sine wave, double width of center line
       }, options );
 
       const length = endPoint.distance(startPoint);
@@ -54,12 +58,13 @@
         shape1.lineToPoint( startPoint.plus(pointFromStart) );
       }
       const path0 = new Path( shape0, {
-        stroke: 'gray',
-        lineWidth: 1
+        stroke: options.centerStroke,
+        lineWidth: options.lineWidth/2
       });
+      //console.log(options.stroke);
       const path1 = new Path( shape1, {
-        stroke: 'black',
-        lineWidth: 2
+        stroke: options.stroke,
+        lineWidth: options.lineWidth
       } );
 
       // this is the light wave

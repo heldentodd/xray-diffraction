@@ -8,7 +8,7 @@
  * @author Chandrashekar Bemagoni (Actual Concepts)
  */
 
-import Property from '../../../../axon/js/Property.js';
+import NumberProperty from '../../../../axon/js/NumberProperty.js';
 import Shape from '../../../../kite/js/Shape.js';
 import SimpleDragHandler from '../../../../scenery/js/input/SimpleDragHandler.js';
 import Image from '../../../../scenery/js/nodes/Image.js';
@@ -66,7 +66,7 @@ class ProtractorNode extends Node {
     this.cursor = 'pointer';
 
     if ( rotateable ) {
-      this.protractorAngleProperty = new Property( 0.0 );
+      this.protractorAngleProperty = new NumberProperty( 0.0 );
 
       // add a mouse listener for rotating when the rotate shape (the outer ring in the 'prism' screen is dragged)
       const rotatePath = new Path( this.outerRimShape, {

@@ -26,11 +26,12 @@
   
   class CrystalNode extends Node {
     /**
-     * @param { [  ] } lattice - Array of Vector2 points for the crystal lattice
+     * @param { Object } lattice - describes lattice. lattice.sites is an Array of Vector2 points for the crystal lattice
      */
     constructor( lattice ) {
 
       //----------------------------------------------------------------------------------------
+      assert && assert( Array.isArray(lattice.sites) , `lattice.sites should be an Array: ${lattice.sites}` );
 
       super();
       
@@ -53,9 +54,12 @@
       this.addChild(atomsNode);
       
       // Label lattice constants
-      const aDimensionArrow = new ArrowNode( ScaleF * xMin, ScaleF * lattice.latticeConstantsP.value.z, ScaleF * (xMin + lattice.latticeConstantsP.value.x), ScaleF * lattice.latticeConstantsP.value.z, DIMENSION_ARROW_OPTIONS );
-      const bDimensionArrow = new ArrowNode( ScaleF * xMin, 0, ScaleF * xMin, ScaleF * lattice.latticeConstantsP.value.z, DIMENSION_ARROW_OPTIONS );
-      const dDimensionArrow = new ArrowNode( ScaleF * xMin, ScaleF * yMin, ScaleF * xMin, ScaleF * (yMin + lattice.latticeConstantsP.value.z), DIMENSION_ARROW_OPTIONS );
+      const aDimensionArrow = new ArrowNode( ScaleF * xMin, ScaleF * lattice.latticeConstantsP.value.z,
+        ScaleF * (xMin + lattice.latticeConstantsP.value.x), ScaleF * lattice.latticeConstantsP.value.z, DIMENSION_ARROW_OPTIONS );
+      const bDimensionArrow = new ArrowNode( ScaleF * xMin, 0, ScaleF * xMin,
+        ScaleF * lattice.latticeConstantsP.value.z, DIMENSION_ARROW_OPTIONS );
+      const dDimensionArrow = new ArrowNode( ScaleF * xMin, ScaleF * yMin, ScaleF * xMin,
+        ScaleF * (yMin + lattice.latticeConstantsP.value.z), DIMENSION_ARROW_OPTIONS );
       this.addChild( aDimensionArrow );
       this.addChild( bDimensionArrow );
       this.addChild( dDimensionArrow );
@@ -64,8 +68,10 @@
       const dDimensionLabel = new RichText( interplaneDistanceString, { maxWidth: 100, centerY: dDimensionArrow.centerY, right: dDimensionArrow.centerX - 5 } );
       
       // fake labels to keep field centered
-      const fakeLabel1 = new RichText( interplaneDistanceString, { fill: 'white', maxWidth: 100, centerY: dDimensionArrow.centerY, left: - dDimensionArrow.centerX + 5 } );
-      const fakeLabel2 = new RichText( aLatticeConstantString, { fill: 'white', maxWidth: 100, centerX: aDimensionArrow.centerX, bottom: - aDimensionArrow.centerY } );
+      const fakeLabel1 = new RichText( interplaneDistanceString,
+        { fill: 'white', maxWidth: 100, centerY: dDimensionArrow.centerY, left: - dDimensionArrow.centerX + 5 } );
+      const fakeLabel2 = new RichText( aLatticeConstantString,
+        { fill: 'white', maxWidth: 100, centerX: aDimensionArrow.centerX, bottom: - aDimensionArrow.centerY } );
       this.addChild( aDimensionLabel );
       this.addChild( bDimensionLabel );
       this.addChild( dDimensionLabel );

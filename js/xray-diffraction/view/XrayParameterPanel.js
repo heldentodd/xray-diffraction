@@ -52,7 +52,8 @@
       const _2dSinText = new RichText( '?', textOptions );
       const _2dSinLambdaText = new RichText( '?', textOptions );
      
-      // Links the current incident angle, lattice parameters, wavelength, 2dsin(Theta), and 2dsin(Theta)/wavelength to the text variables declared above
+      // Links the current incident angle, lattice parameters, wavelength, 2dsin(Theta), and 2dsin(Theta)/wavelength 
+      // to the text variables declared above
       Property.multilink( [
         model.sourceAngleProperty,
         model.lattice.latticeConstantsP,
@@ -65,8 +66,8 @@
           wavelengthText.text = wavelengthString + ' = ' + Utils.toFixed( model.sourceWavelengthProperty.value, 1 ) + wavelengthUnitString;
           _2dSinText.text = '2' + interplaneDistanceString + ' sin(θ) = ' +
                             Utils.toFixed( 2 * model.lattice.latticeConstantsP.value.z * Math.sin(model.sourceAngleProperty.value), 1 ) + wavelengthUnitString;
-          _2dSinLambdaText.text = '2' + interplaneDistanceString + ' sin(θ)/λ = ' +
-                                  Utils.toFixed( 2 * model.lattice.latticeConstantsP.value.z * Math.sin(model.sourceAngleProperty.value) / model.sourceWavelengthProperty.value, 2 );
+          _2dSinLambdaText.text = '2' + interplaneDistanceString + ' sin(θ)/λ = ' + Utils.toFixed(
+            2 * model.lattice.latticeConstantsP.value.z * Math.sin(model.sourceAngleProperty.value) / model.sourceWavelengthProperty.value, 2 );
         } );
       
       const content = new Node();

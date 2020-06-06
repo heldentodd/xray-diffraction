@@ -31,7 +31,10 @@
     */
     constructor( latticeConstants, orientation ) {
 
-      //super( latticeConstants, orientation );
+      assert && assert( latticeConstants.x > 0 , `Lattice constants should be positive: ${latticeConstants.x}` );
+      assert && assert( latticeConstants.y > 0 , `Lattice constants should be positive: ${latticeConstants.y}` );
+      assert && assert( latticeConstants.z > 0 , `Lattice constants should be positive: ${latticeConstants.z}` );
+      assert && assert( orientation > -7 && orientation < 7 , `Orientation (radians) normally < 2π: ${orientation}` );
 
       this.anglePhiProperty = new NumberProperty( 0 );
       
@@ -125,7 +128,6 @@
           }
         }
       }
-      return;
     }
   }
 

@@ -34,8 +34,9 @@
   class XrayControlPanel extends Panel {
 
     /**
-     * @param {Object} model
+     * @param {XrayDiffractionModel} model
      */
+
     constructor( model ) {
 
       const angleTitle = new RichText( incidentAngleString, textOptions );

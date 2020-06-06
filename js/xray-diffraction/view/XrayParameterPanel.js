@@ -33,7 +33,7 @@
   class XrayParameterPanel extends Panel {
 
     /**
-     * @param {Object} model
+     * @param {XrayDiffractionModel} model
      * @param {Object} [options]
      */
     constructor( model, options ) {
@@ -47,7 +47,7 @@
 
       // Text nodes that reflects the incident angle, lattice parameters, wavelength, 2dsin(Theta), and 2dsin(Theta)/wavelength
       const angleText = new RichText( '?', textOptions );
-      const latticeConstanstText = new RichText( '?', textOptions );
+      const latticeConstantsText = new RichText( '?', textOptions );
       const wavelengthText = new RichText( '?', textOptions );
       const _2dSinText = new RichText( '?', textOptions );
       const _2dSinLambdaText = new RichText( '?', textOptions );
@@ -56,23 +56,23 @@
       // to the text variables declared above
       Property.multilink( [
         model.sourceAngleProperty,
-        model.lattice.latticeConstantsP,
+        model.lattice.latticeConstantsProperty,
         model.sourceWavelengthProperty
         ], () => {
           angleText.text = incidentAngleString + ' = ' + Utils.toFixed( model.sourceAngleProperty.value * 180 / Math.PI, 1 ) + angleUnitString;
-          latticeConstanstText.text = aLatticeConstantString + ' = ' + Utils.toFixed( model.lattice.latticeConstantsP.value.x, 1 )
+          latticeConstantsText.text = aLatticeConstantString + ' = ' + Utils.toFixed( model.lattice.latticeConstantsProperty.value.x, 1 )
                                       + wavelengthUnitString + '   ' + bLatticeConstantString + ' = ' + interplaneDistanceString + ' = '
-                                      + Utils.toFixed( model.lattice.latticeConstantsP.value.z, 1 ) + wavelengthUnitString;
+                                      + Utils.toFixed( model.lattice.latticeConstantsProperty.value.z, 1 ) + wavelengthUnitString;
           wavelengthText.text = wavelengthString + ' = ' + Utils.toFixed( model.sourceWavelengthProperty.value, 1 ) + wavelengthUnitString;
           _2dSinText.text = '2' + interplaneDistanceString + ' sin(θ) = ' +
-                            Utils.toFixed( 2 * model.lattice.latticeConstantsP.value.z * Math.sin(model.sourceAngleProperty.value), 1 ) + wavelengthUnitString;
+              Utils.toFixed( 2 * model.lattice.latticeConstantsProperty.value.z * Math.sin(model.sourceAngleProperty.value), 1 ) + wavelengthUnitString;
           _2dSinLambdaText.text = '2' + interplaneDistanceString + ' sin(θ)/λ = ' + Utils.toFixed(
-            2 * model.lattice.latticeConstantsP.value.z * Math.sin(model.sourceAngleProperty.value) / model.sourceWavelengthProperty.value, 2 );
+            2 * model.lattice.latticeConstantsProperty.value.z * Math.sin(model.sourceAngleProperty.value) / model.sourceWavelengthProperty.value, 2 );
         } );
       
       const content = new Node();
       content.addChild( angleText );
-      content.addChild( latticeConstanstText );
+      content.addChild( latticeConstantsText );
       content.addChild( wavelengthText );
       content.addChild( _2dSinText );
       content.addChild( _2dSinLambdaText );
@@ -80,10 +80,10 @@
       // Define positioning in the panel
       angleText.left = INSET;
       angleText.top = INSET;
-      latticeConstanstText.left = INSET;
-      latticeConstanstText.top = angleText.bottom + LABEL_SPACING;
+      latticeConstantsText.left = INSET;
+      latticeConstantsText.top = angleText.bottom + LABEL_SPACING;
       wavelengthText.left = INSET;
-      wavelengthText.top = latticeConstanstText.bottom + LABEL_SPACING;
+      wavelengthText.top = latticeConstantsText.bottom + LABEL_SPACING;
       _2dSinText.left = INSET;
       _2dSinText.top = wavelengthText.bottom + LABEL_SPACING;
       _2dSinLambdaText.left = INSET;

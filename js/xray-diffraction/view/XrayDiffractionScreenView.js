@@ -39,7 +39,7 @@ const pathDifferenceEqualsString = xrayDiffractionStrings.pathDifferenceEquals;
   
 const DIMENSION_ARROW_OPTIONS = { fill: 'black', stroke: null, tailWidth: 2, headWidth: 7, headHeight: 20, doubleHead: true };
 const AMP = 10;
-const scaleF = 8;
+const SCALE_FACTOR = XrayDiffractionConstants.SCALE_FACTOR;
 
 class XrayDiffractionScreenView extends ScreenView {
 
@@ -76,11 +76,11 @@ class XrayDiffractionScreenView extends ScreenView {
 
         //reorient text and make it visible
         const theta = model.sourceAngleProperty.get();
-        const rayEnd = new Vector2(this.crystalNode.centerX,this.crystalNode.centerY).minus(model.lattice.sites[0].timesScalar(scaleF));
+        const rayEnd = new Vector2(this.crystalNode.centerX,this.crystalNode.centerY).minus(model.lattice.sites[0].timesScalar(SCALE_FACTOR));
         let rayStart = new Vector2(200,0);
         rayStart = rayEnd.minus( rayStart.rotated( Math.PI - theta ) );
         if (model.showWaveFrontsProperty.value) {
-          const raySep = 4 * ( model.lattice.latticeConstantsP.value.z * Math.cos(theta));
+          const raySep = 4 * ( model.lattice.latticeConstantsProperty.value.z * Math.cos(theta));
           rayStart = rayStart.addXY( - (raySep + AMP) * Math.sin(theta), - (raySep + AMP) * Math.cos(theta) );
         }
         else {
@@ -109,8 +109,8 @@ class XrayDiffractionScreenView extends ScreenView {
       model.lattice.aConstantProperty,
       model.lattice.cConstantProperty
       ], () => {
-        model.lattice.latticeConstantsP.value.x = model.lattice.aConstantProperty.value;
-        model.lattice.latticeConstantsP.value.z = model.lattice.cConstantProperty.value;
+        model.lattice.latticeConstantsProperty.value.x = model.lattice.aConstantProperty.value;
+        model.lattice.latticeConstantsProperty.value.z = model.lattice.cConstantProperty.value;
         model.lattice.updateSites();
         this.removeChild( this.crystalNode );
         this.crystalNode = new CrystalNode (model.lattice);
@@ -265,10 +265,10 @@ class XrayDiffractionScreenView extends ScreenView {
   
   drawLight(model, crystalNode) {
     const theta = model.sourceAngleProperty.get();
-    const lamda = scaleF * model.sourceWavelengthProperty.get();
-    const raySeparation = scaleF * ( model.lattice.latticeConstantsP.value.z * Math.cos(theta));
+    const lamda = SCALE_FACTOR * model.sourceWavelengthProperty.get();
+    const raySeparation = SCALE_FACTOR * ( model.lattice.latticeConstantsProperty.value.z * Math.cos(theta));
       
-    const incidentRay1End = new Vector2(crystalNode.centerX,crystalNode.centerY).minus(model.lattice.sites[0].timesScalar(scaleF));
+    const incidentRay1End = new Vector2(crystalNode.centerX,crystalNode.centerY).minus(model.lattice.sites[0].timesScalar(SCALE_FACTOR));
     let incidentRay1Start = new Vector2(400,0);
     incidentRay1Start = incidentRay1End.minus( incidentRay1Start.rotated(model.sourceAngleProperty.get() ) );
     
@@ -276,7 +276,7 @@ class XrayDiffractionScreenView extends ScreenView {
   
     // if checked, draw the Path Length Difference region
     if (model.pathDifferenceProperty.value) {
-      const dSinTheta = scaleF * ( model.lattice.latticeConstantsP.value.z * Math.sin(theta));
+      const dSinTheta = SCALE_FACTOR * ( model.lattice.latticeConstantsProperty.value.z * Math.sin(theta));
       const lineStart = incidentRay1End;
       const lineInEnd = new Vector2(lineStart.x - (AMP + raySeparation) * Math.sin(theta), lineStart.y + (AMP + raySeparation) * Math.cos(theta));
       const lineOutEnd = new Vector2(lineStart.x + (AMP + raySeparation) * Math.sin(theta), lineStart.y + (AMP + raySeparation) * Math.cos(theta));
@@ -331,29 +331,29 @@ class XrayDiffractionScreenView extends ScreenView {
     }
   
   // Main logic to draw the light rays
-    const horiz = Math.floor (Math.min(model.horizontalRaysProperty.get(), 20/model.lattice.latticeConstantsP.get().x));
+    const horiz = Math.floor (Math.min(model.horizontalRaysProperty.get(), 20/model.lattice.latticeConstantsProperty.get().x));
     const vert = Math.min ( Math.floor( model.verticalRaysProperty.get() ) ,
-      1 + 2 * Math.floor( 20 / model.lattice.latticeConstantsP.get().z ) );
+      1 + 2 * Math.floor( 20 / model.lattice.latticeConstantsProperty.get().z ) );
     for (let i = - horiz; i <= horiz; i++) {
       for (let j = 0; j < vert; j++) {
-        const shift = new Vector2( scaleF * i * model.lattice.latticeConstantsP.get().x,
-          - scaleF * j * model.lattice.latticeConstantsP.get().z );
-        const distance = scaleF * (i * model.lattice.latticeConstantsP.get().x * Math.sin(theta)
-                                   + j * model.lattice.latticeConstantsP.get().z * Math.cos(theta));
+        const shift = new Vector2( SCALE_FACTOR * i * model.lattice.latticeConstantsProperty.get().x,
+          - SCALE_FACTOR * j * model.lattice.latticeConstantsProperty.get().z );
+        const distance = SCALE_FACTOR * (i * model.lattice.latticeConstantsProperty.get().x * Math.sin(theta)
+                                   + j * model.lattice.latticeConstantsProperty.get().z * Math.cos(theta));
         const incidentRayStart = new Vector2(incidentRay1Start.x - distance * Math.sin(theta),
                                              incidentRay1Start.y + distance * Math.cos(theta));
         const incidentRayEnd = incidentRay1End.minus(shift);
         const incidentRayLength = incidentRayEnd.minus(incidentRayStart).getMagnitude();
         const exitRayPhase = (incidentRayLength / lamda /*- Math.floor(incidentRayLength / lamda)*/) * 2 * Math.PI + model.startPhase;
-        const extraLength = 2 * scaleF * Math.cos(theta) * i * model.lattice.latticeConstantsP.get().x;
+        const extraLength = 2 * SCALE_FACTOR * Math.cos(theta) * i * model.lattice.latticeConstantsProperty.get().x;
         const exitRayEnd = new Vector2(2 * incidentRayEnd.x - incidentRayStart.x + extraLength * Math.cos(theta),
           incidentRayStart.y - extraLength * Math.sin(theta));
-        this.lightPathsNode.addChild( new LightPathNode ( incidentRayStart , incidentRayEnd , scaleF * model.sourceWavelengthProperty.get(), {
+        this.lightPathsNode.addChild( new LightPathNode ( incidentRayStart , incidentRayEnd , SCALE_FACTOR * model.sourceWavelengthProperty.get(), {
           amplitude: AMP,
           startPhase: model.startPhase,
           waveFrontWidth: raySeparation * model.showWaveFrontsProperty.value
          } ) );
-        this.lightPathsNode.addChild( new LightPathNode ( incidentRayEnd , exitRayEnd , scaleF * model.sourceWavelengthProperty.get(), {
+        this.lightPathsNode.addChild( new LightPathNode ( incidentRayEnd , exitRayEnd , SCALE_FACTOR * model.sourceWavelengthProperty.get(), {
           amplitude: AMP,
           startPhase: exitRayPhase,
           waveFrontWidth: raySeparation * model.showWaveFrontsProperty.value

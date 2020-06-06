@@ -18,7 +18,7 @@
 
   //----------------------------------------------------------------------------------------
   // constants
-  const crystalSize = 20; // size of the crystal in Angstrom. Width and Height from the center
+  const CRYSTAL_SIZE = 20; // size of the crystal in Angstrom. Width and Height from the center
 
   class Lattice {
 
@@ -42,7 +42,7 @@
       this.aConstantProperty = new NumberProperty( latticeConstants.x );
       this.bConstantProperty = new NumberProperty( latticeConstants.y );
       this.cConstantProperty = new NumberProperty( latticeConstants.z );
-      this.latticeConstantsP = new DerivedProperty( [this.aConstantProperty, this.bConstantProperty, this.cConstantProperty ], combineConstants );
+      this.latticeConstantsProperty = new DerivedProperty( [this.aConstantProperty, this.bConstantProperty, this.cConstantProperty ], combineConstants );
       
       // @public {number} the orientation in radians relative to the incoming light
       this.orientationProperty =  new NumberProperty( orientation );
@@ -60,7 +60,7 @@
      */
     reset() {
       this.anglePhiProperty.reset();
-      //this.latticeConstantsP.reset();
+      //this.latticeConstantsProperty.reset();
       this.orientationProperty.reset();
       this.aConstantProperty.reset();
       this.bConstantProperty.reset();
@@ -74,16 +74,15 @@
 
     updateSites() {
       /**
-     * Returns an array of lattice points
-     * @returns {Array}
+     * recreates this.sites (lattice points) based on current parameters
      * @private
      */// Called when lattice constant changes or crystal rotates.
 
       // should set above or in initialization file. Perhaps better to confine it to a shape.
-      const aLattice = this.latticeConstantsP.get().x;
-      const cLattice = this.latticeConstantsP.get().z;
-      const crystalXMax = crystalSize / aLattice; // Must be at least 1 to have a three row lattice
-      const crystalYMax = crystalSize / cLattice;
+      const aLattice = this.latticeConstantsProperty.get().x;
+      const cLattice = this.latticeConstantsProperty.get().z;
+      const crystalXMax = CRYSTAL_SIZE / aLattice; // Must be at least 1 to have a three row lattice
+      const crystalYMax = CRYSTAL_SIZE / cLattice;
 
       const cosTheta = Math.cos(this.orientationProperty.get());
       const sinTheta = Math.sin(this.orientationProperty.get());

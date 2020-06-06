@@ -12,6 +12,7 @@
   import RadialGradient from '../../../../scenery/js/util/RadialGradient.js';
   import RichText from '../../../../scenery/js/nodes/RichText.js';
   import xrayDiffraction from '../../xrayDiffraction.js';
+  import XrayDiffractionConstants from '../../common/XrayDiffractionConstants.js';
   import xrayDiffractionStrings from '../../xrayDiffractionStrings.js';
 
   // strings
@@ -22,7 +23,7 @@
 // constants
   const RADIUS = 5;   //Atomic Nucleus Radius
   const DIMENSION_ARROW_OPTIONS = { fill: 'black', stroke: null, tailWidth: 2, headWidth: 7, headHeight: 20, doubleHead: true };
-  const ScaleF = 8;
+  const SCALE_FACTOR = XrayDiffractionConstants.SCALE_FACTOR;
   
   class CrystalNode extends Node {
     /**
@@ -41,7 +42,7 @@
 
       lattice.sites.forEach( function (site) {
         const atom = new Circle( RADIUS, {
-          x: ScaleF * site.x, y: ScaleF * site.y,
+          x: SCALE_FACTOR * site.x, y: SCALE_FACTOR * site.y,
           fill: new RadialGradient( 2, -3, 2, 2, -3, 7 )
             .addColorStop( 0, '#f97d7d' )
             .addColorStop( 0.5, '#ed4545' )
@@ -54,12 +55,12 @@
       this.addChild(atomsNode);
       
       // Label lattice constants
-      const aDimensionArrow = new ArrowNode( ScaleF * xMin, ScaleF * lattice.latticeConstantsP.value.z,
-        ScaleF * (xMin + lattice.latticeConstantsP.value.x), ScaleF * lattice.latticeConstantsP.value.z, DIMENSION_ARROW_OPTIONS );
-      const bDimensionArrow = new ArrowNode( ScaleF * xMin, 0, ScaleF * xMin,
-        ScaleF * lattice.latticeConstantsP.value.z, DIMENSION_ARROW_OPTIONS );
-      const dDimensionArrow = new ArrowNode( ScaleF * xMin, ScaleF * yMin, ScaleF * xMin,
-        ScaleF * (yMin + lattice.latticeConstantsP.value.z), DIMENSION_ARROW_OPTIONS );
+      const aDimensionArrow = new ArrowNode( SCALE_FACTOR * xMin, SCALE_FACTOR * lattice.latticeConstantsProperty.value.z,
+        SCALE_FACTOR * (xMin + lattice.latticeConstantsProperty.value.x), SCALE_FACTOR * lattice.latticeConstantsProperty.value.z, DIMENSION_ARROW_OPTIONS );
+      const bDimensionArrow = new ArrowNode( SCALE_FACTOR * xMin, 0, SCALE_FACTOR * xMin,
+        SCALE_FACTOR * lattice.latticeConstantsProperty.value.z, DIMENSION_ARROW_OPTIONS );
+      const dDimensionArrow = new ArrowNode( SCALE_FACTOR * xMin, SCALE_FACTOR * yMin, SCALE_FACTOR * xMin,
+        SCALE_FACTOR * (yMin + lattice.latticeConstantsProperty.value.z), DIMENSION_ARROW_OPTIONS );
       this.addChild( aDimensionArrow );
       this.addChild( bDimensionArrow );
       this.addChild( dDimensionArrow );

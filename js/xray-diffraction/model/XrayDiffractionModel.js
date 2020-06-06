@@ -37,8 +37,8 @@ class XrayDiffractionModel {
        this.showParmsProperty = new BooleanProperty( false );
        this.showWaveFrontsProperty = new BooleanProperty( false );
 
-       this.pLDProperty = new DerivedProperty( [this.lattice.latticeConstantsP, this.sourceAngleProperty ], computepLD );
-       this.pLDWavelengthsProperty = new DerivedProperty( [this.pLDProperty, this.sourceWavelengthProperty], computepLDWavelengths );
+       this.pLDProperty = new DerivedProperty( [this.lattice.latticeConstantsProperty, this.sourceAngleProperty ], computePLD );
+       this.pLDWavelengthsProperty = new DerivedProperty( [this.pLDProperty, this.sourceWavelengthProperty], computePLDWavelengths );
 
        this.startPhase = 0 ;
   }
@@ -82,11 +82,11 @@ class XrayDiffractionModel {
   }
 }
 
-function computepLD( constants, theta ) {
+function computePLD( constants, theta ) {
   return 2 * constants.z * Math.sin(theta);
 }
 
-function computepLDWavelengths( pLD, wavelength ) {
+function computePLDWavelengths( pLD, wavelength ) {
   return pLD/wavelength;
 }
 

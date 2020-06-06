@@ -11,7 +11,8 @@ import xrayDiffraction from '../xrayDiffraction.js';
 const XrayDiffractionConstants = {
 
   SCREEN_VIEW_X_MARGIN: 15,
-  SCREEN_VIEW_Y_MARGIN: 15
+  SCREEN_VIEW_Y_MARGIN: 15,
+  SCALE_FACTOR: 8
 
   //TODO
 };

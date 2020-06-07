@@ -5,6 +5,7 @@
  *
  * @author Todd Holden (Queensborough Community College of CUNY)
  */
+
 // modules
 import ArrowNode from '../../../../scenery-phet/js/ArrowNode.js';
 import Circle from '../../../../scenery/js/nodes/Circle.js';
@@ -21,7 +22,7 @@ const bLatticeConstantString = xrayDiffractionStrings.bLatticeConstant;
 const interplaneDistanceString = xrayDiffractionStrings.interplaneDistance;
 
 // constants
-const RADIUS = 5;   //Atomic Nucleus Radius
+const RADIUS = 5;   // Atomic Nucleus Radius
 const DIMENSION_ARROW_OPTIONS = { fill: 'black', stroke: null, tailWidth: 2, headWidth: 7, headHeight: 20, doubleHead: true };
 const SCALE_FACTOR = XrayDiffractionConstants.SCALE_FACTOR;
 

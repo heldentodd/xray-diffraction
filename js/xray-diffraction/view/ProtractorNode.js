@@ -7,6 +7,7 @@
  * @author Sam Reid (PhET Interactive Simulations)
  * @author Chandrashekar Bemagoni (Actual Concepts)
  */
+// TODO: replace this file when PhET has generalized ProtractorNode, see https://github.com/phetsims/scenery-phet/issues/609
 
 import NumberProperty from '../../../../axon/js/NumberProperty.js';
 import Shape from '../../../../kite/js/Shape.js';

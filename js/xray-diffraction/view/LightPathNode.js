@@ -1,17 +1,18 @@
 // Copyright 2019-2020, University of Colorado Boulder
 
-import Utils from '../../../../dot/js/Utils.js';
-import Vector2 from '../../../../dot/js/Vector2.js';
-import Shape from '../../../../kite/js/Shape.js';
 /**
  * Draws a sinusoidal wave with a dashed line to represent a light path. Can also display wavefronts in multicolor.
  *
  * @author Todd Holden (Queensborough Community College of CUNY)
  */
+
 // modules
 import merge from '../../../../phet-core/js/merge.js';
 import Node from '../../../../scenery/js/nodes/Node.js';
 import Path from '../../../../scenery/js/nodes/Path.js';
+import Shape from '../../../../kite/js/Shape.js';
+import Utils from '../../../../dot/js/Utils.js';
+import Vector2 from '../../../../dot/js/Vector2.js';
 import xrayDiffraction from '../../xrayDiffraction.js';
 
 // constants
@@ -65,7 +66,6 @@ class LightPathNode extends Node {
       stroke: options.centerStroke,
       lineWidth: options.lineWidth / 2
     } );
-    //console.log(options.stroke);
     const wavePath = new Path( waveShape, {
       stroke: options.stroke,
       lineWidth: options.lineWidth

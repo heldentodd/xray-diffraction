@@ -1,7 +1,5 @@
 // Copyright 2019-2020, University of Colorado Boulder
 
-import Property from '../../../../axon/js/Property.js';
-import Utils from '../../../../dot/js/Utils.js';
 /**
  * Shows the major parameters, including frequency, wavelength, amplitude, path length difference, etc.
  *
@@ -12,6 +10,8 @@ import merge from '../../../../phet-core/js/merge.js';
 import Node from '../../../../scenery/js/nodes/Node.js';
 import RichText from '../../../../scenery/js/nodes/RichText.js';
 import Panel from '../../../../sun/js/Panel.js';
+import Property from '../../../../axon/js/Property.js';
+import Utils from '../../../../dot/js/Utils.js';
 import xrayDiffraction from '../../xrayDiffraction.js';
 import xrayDiffractionStrings from '../../xrayDiffractionStrings.js';
 
@@ -24,7 +24,7 @@ const aLatticeConstantString = xrayDiffractionStrings.aLatticeConstant;
 const bLatticeConstantString = xrayDiffractionStrings.bLatticeConstant;
 const interplaneDistanceString = xrayDiffractionStrings.interplaneDistance;
 
-//constants
+// constants
 const textOptions = { maxWidth: 200 };
 const INSET = 10;
 const LABEL_SPACING = 5;

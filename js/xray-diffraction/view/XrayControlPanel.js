@@ -1,18 +1,19 @@
 // Copyright 2019-2020, University of Colorado Boulder
 
-import RangeWithValue from '../../../../dot/js/RangeWithValue.js';
-import Node from '../../../../scenery/js/nodes/Node.js';
-import RichText from '../../../../scenery/js/nodes/RichText.js';
 /**
  * Shows the main controls, including frequency/wavelength and amplitude.
  *
  * @author Todd Holden (Queensborough Community College of CUNY)
  */
+
 // modules
 import Checkbox from '../../../../sun/js/Checkbox.js';
 import HSeparator from '../../../../sun/js/HSeparator.js';
 import HSlider from '../../../../sun/js/HSlider.js';
+import Node from '../../../../scenery/js/nodes/Node.js';
 import Panel from '../../../../sun/js/Panel.js';
+import RangeWithValue from '../../../../dot/js/RangeWithValue.js';
+import RichText from '../../../../scenery/js/nodes/RichText.js';
 import xrayDiffraction from '../../xrayDiffraction.js';
 import xrayDiffractionStrings from '../../xrayDiffractionStrings.js';
 
@@ -160,9 +161,7 @@ class XrayControlPanel extends Panel {
     container.addChild( showWaveFrontsCheckbox );
     container.addChild( showParmsCheckbox );
 
-    //const content = alignGroup.createBox( container );
-
-    super( container/*content, options */ );
+    super( container );
   }
 }
 

@@ -32,7 +32,7 @@ import ProtractorNode from './ProtractorNode.js';
 import XrayControlPanel from './XrayControlPanel.js';
 import XrayParameterPanel from './XrayParameterPanel.js';
 
-//strings
+// strings
 const interplaneDistanceString = xrayDiffractionStrings.interplaneDistance;
 const inPhaseString = xrayDiffractionStrings.inPhase;
 const pathDifferenceEqualsString = xrayDiffractionStrings.pathDifferenceEquals;
@@ -75,7 +75,7 @@ class XrayDiffractionScreenView extends ScreenView {
     model.pLDWavelengthsProperty.changedEmitter.addListener( () => {
       if ( Math.abs( model.pLDWavelengthsProperty.value - Utils.roundSymmetric( model.pLDWavelengthsProperty.value ) ) < 0.014 ) {
 
-        //reorient text and make it visible
+        // reorient text and make it visible
         const theta = model.sourceAngleProperty.get();
         const rayEnd = new Vector2( this.crystalNode.centerX, this.crystalNode.centerY ).minus( model.lattice.sites[ 0 ].timesScalar( SCALE_FACTOR ) );
         let rayStart = new Vector2( 200, 0 );
@@ -210,7 +210,6 @@ class XrayDiffractionScreenView extends ScreenView {
 
     const toolboxNodes = [ protractorNodeIcon, measuringTapeIcon ];
 
-    // toolboxNodes = toolboxNodes.concat( this.getAdditionalToolIcons() );
     this.toolbox = new Panel( new VBox( {
       spacing: 10,
       children: toolboxNodes,
@@ -264,7 +263,7 @@ class XrayDiffractionScreenView extends ScreenView {
    * Draws the light rays (incoming and outgoing) along with the path length difference (PLD) region if checked.
    * For all updates after the initial drawing. If this ends up costing to much time, could be inlined and eliminated.
    * @param {XrayDiffractionModel} model
-   * @param {Node} crystalNode
+   * @param {CrystalNode} crystalNode
    * @public
    */
   redrawLight( model, crystalNode ) {
@@ -276,7 +275,7 @@ class XrayDiffractionScreenView extends ScreenView {
    * Draws the light rays (incoming and outgoing) along with the path length difference (PLD) region if checked.
    * Should one be called for the initial drawing. Otherwise use redrawLight.
    * @param {XrayDiffractionModel} model
-   * @param {Node} crystalNode
+   * @param {CrystalNode} crystalNode
    * @public
    */
   drawLight( model, crystalNode ) {
@@ -296,9 +295,8 @@ class XrayDiffractionScreenView extends ScreenView {
       const lineStart = incidentRay1End;
       const lineInEnd = new Vector2( lineStart.x - ( AMP + raySeparation ) * Math.sin( theta ), lineStart.y + ( AMP + raySeparation ) * Math.cos( theta ) );
       const lineOutEnd = new Vector2( lineStart.x + ( AMP + raySeparation ) * Math.sin( theta ), lineStart.y + ( AMP + raySeparation ) * Math.cos( theta ) );
-      //  
 
-      const pLD = new Shape();
+      const pLD = new Shape(); // Shape to show the edges of the path length difference
       pLD.moveToPoint( lineInEnd );
       pLD.lineToPoint( lineStart );
       pLD.lineToPoint( lineOutEnd );
@@ -334,7 +332,7 @@ class XrayDiffractionScreenView extends ScreenView {
       this.lightPathsNode.addChild( pLDRegionPath1 );
       this.lightPathsNode.addChild( pLDRegionPath2 );
 
-      //add d sin(θ) and dimension arrow
+      // add d sin(θ) and dimension arrow
       const pLDArrowStart = lineStart.plusXY( ( 5 + AMP + raySeparation ) * Math.sin( theta ), ( 5 + AMP + raySeparation ) * Math.cos( theta ) );
       const pLDArrowEnd = pLDArrowStart.plusXY( -dSinTheta * Math.cos( theta ), dSinTheta * Math.sin( theta ) );
       const pLDLabelCenter = pLDArrowStart.plusXY( 5 * Math.sin( theta ) - ( dSinTheta * Math.cos( theta ) ) / 2,
@@ -360,7 +358,7 @@ class XrayDiffractionScreenView extends ScreenView {
           incidentRay1Start.y + distance * Math.cos( theta ) );
         const incidentRayEnd = incidentRay1End.minus( shift );
         const incidentRayLength = incidentRayEnd.minus( incidentRayStart ).getMagnitude();
-        const exitRayPhase = ( incidentRayLength / lamda /*- Math.floor(incidentRayLength / lamda)*/ ) * 2 * Math.PI + model.startPhase;
+        const exitRayPhase = ( incidentRayLength / lamda ) * 2 * Math.PI + model.startPhase;
         const extraLength = 2 * SCALE_FACTOR * Math.cos( theta ) * i * model.lattice.latticeConstantsProperty.get().x;
         const exitRayEnd = new Vector2( 2 * incidentRayEnd.x - incidentRayStart.x + extraLength * Math.cos( theta ),
           incidentRayStart.y - extraLength * Math.sin( theta ) );
@@ -385,7 +383,7 @@ class XrayDiffractionScreenView extends ScreenView {
    * @public
    */
   step( dt ) {
-    //stepping handeled in model
+    // stepping handeled in model
   }
 }
 
@@ -393,7 +391,7 @@ class XrayDiffractionScreenView extends ScreenView {
  * Initialize the icon for use in the toolbox.
  * @param {Node} node
  * @param {Property.<boolean>} inPlayAreaProperty
- * @param {Object} forwardingListener
+ * @param {function} forwardingListener
  */
 const initializeIcon = ( node, inPlayAreaProperty, forwardingListener ) => {
   node.cursor = 'pointer';

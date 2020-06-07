@@ -74,7 +74,7 @@ class Lattice {
      * @public - Called when lattice constant changes or crystal rotates.
      */
 
-      // should set above or in initialization file. Perhaps better to confine it to a shape.
+    // should set above or in initialization file. Perhaps better to confine it to a shape.
     const aLattice = this.latticeConstantsProperty.get().x;
     const cLattice = this.latticeConstantsProperty.get().z;
     const crystalXMax = CRYSTAL_SIZE / aLattice; // Must be at least 1 to have a three row lattice
@@ -84,7 +84,7 @@ class Lattice {
     const sinTheta = Math.sin( this.orientationProperty.get() );
 
     let topRowSpacingHalf;
-    if ( Math.abs( cosTheta ) > 0.7071068 ) { //sqrt(2) for a rectangular lattice to see which face is on top
+    if ( Math.abs( cosTheta ) > 0.7071068 ) { // sqrt(2) for a rectangular lattice to see which face is on top
       topRowSpacingHalf = aLattice * Math.abs( cosTheta ) / 2;
     }
     else {
@@ -107,8 +107,8 @@ class Lattice {
         this.sites.push( new Vector2( -xCos + ySin, -xSin - yCos ) );
         this.sites.push( new Vector2( ySin + xCos, xSin - yCos ) );
 
-        //Find top, center atom and place it in sites[0]. sites[1,2,3] are all still the atom at the center (origin).
-        //We only need to do this for max x and max y if we need to optimize. Could be separated out
+        // Find top, center atom and place it in sites[0]. sites[1,2,3] are all still the atom at the center (origin).
+        // We only need to do this for max x and max y if we need to optimize. Could be separated out
         if ( ( Math.abs( xCos - ySin ) <= topRowSpacingHalf ) && ( ( Math.abs( yCos - xSin ) > this.sites[ 0 ].y ) ) ) {
           if ( ( yCos - xSin ) > 0 ) {
             this.sites[ 0 ] = new Vector2( xCos - ySin, yCos - xSin );

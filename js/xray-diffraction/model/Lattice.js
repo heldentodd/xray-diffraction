@@ -36,21 +36,18 @@ class Lattice {
     assert && assert( latticeConstants.z > 0, `Lattice constants should be positive: ${latticeConstants.z}` );
     assert && assert( orientation > -7 && orientation < 7, `Orientation (radians) normally < 2π: ${orientation}` );
 
-    this.anglePhiProperty = new NumberProperty( 0 );
-
-    // @public {Vector3} the Lattice Constants of the sample (a, b, c)
+    // @public {Vector3} the Lattice Constants of the sample (a, b, c) - if these change, updateSites should be called.
     this.aConstantProperty = new NumberProperty( latticeConstants.x );
     this.bConstantProperty = new NumberProperty( latticeConstants.y );
     this.cConstantProperty = new NumberProperty( latticeConstants.z );
-    this.latticeConstantsProperty = new DerivedProperty( [ this.aConstantProperty, this.bConstantProperty, this.cConstantProperty ], combineConstants );
+    this.latticeConstantsProperty = new DerivedProperty( [ this.aConstantProperty, this.bConstantProperty, this.cConstantProperty ],
+      ( a, b, c ) => new Vector3( a, b, c ) );
 
     // @public {number} the orientation in radians relative to the incoming light
     this.orientationProperty = new NumberProperty( orientation );
 
-    this.reciprocalBasis = new Vector3( 2 * Math.PI / latticeConstants.x, 2 * Math.PI / latticeConstants.y, 2 * Math.PI / latticeConstants.z );
-
-    //could also make this.sites and 2D array of arrays
-    this.sites = new Array();
+    // @public (read-only) {Array.<Vector>} the points on the lattice. Should only be changed with the updateSites call.
+    this.sites = [];
     this.updateSites();
   }
 
@@ -59,12 +56,11 @@ class Lattice {
    * @public
    */
   reset() {
-    this.anglePhiProperty.reset();
-    //this.latticeConstantsProperty.reset();
     this.orientationProperty.reset();
     this.aConstantProperty.reset();
     this.bConstantProperty.reset();
     this.cConstantProperty.reset();
+    this.updateSites();
   }
 
   /**
@@ -75,8 +71,8 @@ class Lattice {
   updateSites() {
     /**
      * recreates this.sites (lattice points) based on current parameters
-     * @private
-     */// Called when lattice constant changes or crystal rotates.
+     * @public - Called when lattice constant changes or crystal rotates.
+     */
 
       // should set above or in initialization file. Perhaps better to confine it to a shape.
     const aLattice = this.latticeConstantsProperty.get().x;
@@ -87,7 +83,7 @@ class Lattice {
     const cosTheta = Math.cos( this.orientationProperty.get() );
     const sinTheta = Math.sin( this.orientationProperty.get() );
 
-    let topRowSpacingHalf = 0;
+    let topRowSpacingHalf;
     if ( Math.abs( cosTheta ) > 0.7071068 ) { //sqrt(2) for a rectangular lattice to see which face is on top
       topRowSpacingHalf = aLattice * Math.abs( cosTheta ) / 2;
     }
@@ -111,7 +107,7 @@ class Lattice {
         this.sites.push( new Vector2( -xCos + ySin, -xSin - yCos ) );
         this.sites.push( new Vector2( ySin + xCos, xSin - yCos ) );
 
-        //Find top, center atom and place it in sites[0]. sites[1,2,3] are all still the origin.
+        //Find top, center atom and place it in sites[0]. sites[1,2,3] are all still the atom at the center (origin).
         //We only need to do this for max x and max y if we need to optimize. Could be separated out
         if ( ( Math.abs( xCos - ySin ) <= topRowSpacingHalf ) && ( ( Math.abs( yCos - xSin ) > this.sites[ 0 ].y ) ) ) {
           if ( ( yCos - xSin ) > 0 ) {
@@ -132,10 +128,6 @@ class Lattice {
       }
     }
   }
-}
-
-function combineConstants( a, b, c ) {
-  return new Vector3( a, b, c );
 }
 
 xrayDiffraction.register( 'Lattice', Lattice );

@@ -27,6 +27,7 @@ class XrayDiffractionModel {
     // @protected - used to signal when a sim step has occurred
     this.stepEmitter = new Emitter( { parameters: [ { valueType: 'number' } ] } );
 
+    // @public - these are the parameters set by the simulation's control panel
     this.lattice = new Lattice( new Vector3( 3.82, 3.89, 7.8 ), 0 );
     this.sourceAngleProperty = new NumberProperty( Math.PI / 3 );
     this.sourceWavelengthProperty = new NumberProperty( 8 );
@@ -37,9 +38,12 @@ class XrayDiffractionModel {
     this.showParmsProperty = new BooleanProperty( false );
     this.showWaveFrontsProperty = new BooleanProperty( false );
 
-    this.pLDProperty = new DerivedProperty( [ this.lattice.latticeConstantsProperty, this.sourceAngleProperty ], computePLD );
-    this.pLDWavelengthsProperty = new DerivedProperty( [ this.pLDProperty, this.sourceWavelengthProperty ], computePLDWavelengths );
+    this.pLDProperty = new DerivedProperty( [ this.lattice.latticeConstantsProperty, this.sourceAngleProperty ],
+      ( constants, theta ) => 2 * constants.z * Math.sin( theta ) );
+    this.pLDWavelengthsProperty = new DerivedProperty( [ this.pLDProperty, this.sourceWavelengthProperty ],
+      ( pLD, wavelength ) => pLD / wavelength );
 
+    // @private - initial phase of the incoming beam. Starts as a cosine function. Probably wouldn't hurt to change this, but no real reason to do so.
     this.startPhase = 0;
   }
 
@@ -80,14 +84,6 @@ class XrayDiffractionModel {
       this.stepEmitter.emit( dt );
     }
   }
-}
-
-function computePLD( constants, theta ) {
-  return 2 * constants.z * Math.sin( theta );
-}
-
-function computePLDWavelengths( pLD, wavelength ) {
-  return pLD / wavelength;
 }
 
 xrayDiffraction.register( 'XrayDiffractionModel', XrayDiffractionModel );

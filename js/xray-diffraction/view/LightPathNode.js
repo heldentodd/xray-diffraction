@@ -20,11 +20,15 @@ class LightPathNode extends Node {
   /**
    * @param {Vector2} startPoint - where light beam starts
    * @param {Vector2} endPoint - where light beam ends
-   * @param {number} wavelength - wavelength of beam, units??
+   * @param {number} wavelength - wavelength of beam in Angstrom
+   * @param {Object} [options]
    */
   constructor( startPoint, endPoint, wavelength, options ) {
 
+    assert && assert( wavelength > 0, `wavelength should be positive: ${wavelength}` );
+
     options = merge( {
+      // @public - options provided to override default appearance of wave, including showing the wavefronts
       amplitude: 10,  // amplitude of the wave. Might be better to have default amplitude: (endPoint - startPoint)/10
       startPhase: 0, // initial phase of the wave (0 for cosine wave)
       waveFrontWidth: 0, // 0 for no wavefronts
@@ -41,35 +45,35 @@ class LightPathNode extends Node {
     //----------------------------------------------------------------------------------------
 
     super();
-    let shape0 = new Shape();
-    const shape1 = new Shape();
+    let rayShape = new Shape();
+    const waveShape = new Shape();
     const cosTheta = Math.cos( theta );
     const sinTheta = Math.sin( theta );
-    shape0.moveToPoint( startPoint );
-    shape0.lineToPoint( endPoint );
-    shape0 = shape0.getDashedShape( [ 8 ], 0 );
+    rayShape.moveToPoint( startPoint );
+    rayShape.lineToPoint( endPoint );
+    rayShape = rayShape.getDashedShape( [ 8 ], 0 );
     let pointFromStart = new Vector2( options.amplitude * Math.cos( options.startPhase ) * sinTheta,
       -options.amplitude * Math.cos( options.startPhase ) * cosTheta );
-    shape1.moveToPoint( startPoint.plus( pointFromStart ) );
+    waveShape.moveToPoint( startPoint.plus( pointFromStart ) );
     for ( let i = 0; i < segments; i++ ) {
       const currentL = i * length / ( segments - 1 );
       pointFromStart = new Vector2( currentL * cosTheta + options.amplitude * Math.cos( wnK * currentL + options.startPhase ) * sinTheta,
         currentL * sinTheta - options.amplitude * Math.cos( wnK * currentL + options.startPhase ) * cosTheta );
-      shape1.lineToPoint( startPoint.plus( pointFromStart ) );
+      waveShape.lineToPoint( startPoint.plus( pointFromStart ) );
     }
-    const path0 = new Path( shape0, {
+    const rayPath = new Path( rayShape, {
       stroke: options.centerStroke,
       lineWidth: options.lineWidth / 2
     } );
     //console.log(options.stroke);
-    const path1 = new Path( shape1, {
+    const wavePath = new Path( waveShape, {
       stroke: options.stroke,
       lineWidth: options.lineWidth
     } );
 
     // this is the light wave
-    this.addChild( path0 );
-    this.addChild( path1 );
+    this.addChild( rayPath );
+    this.addChild( wavePath );
 
     // logic to show wavefronts
     if ( options.waveFrontWidth ) {

@@ -55,6 +55,7 @@ class XrayDiffractionScreenView extends ScreenView {
       tandem: tandem
     } );
 
+    // @private
     this.crystalNode = new CrystalNode( model.lattice );
     this.crystalNode.centerX = 400;
     this.crystalNode.centerY = 450;
@@ -232,7 +233,6 @@ class XrayDiffractionScreenView extends ScreenView {
         model.reset();
         this.reset();
         measuringTapeNode.reset();
-        model.lattice.updateSites();
         this.removeChild( this.crystalNode );
         this.crystalNode = new CrystalNode( model.lattice );
         this.crystalNode.centerX = 400;
@@ -260,11 +260,25 @@ class XrayDiffractionScreenView extends ScreenView {
     //  done in the reset all button
   }
 
+  /**
+   * Draws the light rays (incoming and outgoing) along with the path length difference (PLD) region if checked.
+   * For all updates after the initial drawing. If this ends up costing to much time, could be inlined and eliminated.
+   * @param {XrayDiffractionModel} model
+   * @param {Node} crystalNode
+   * @public
+   */
   redrawLight( model, crystalNode ) {
     this.removeChild( this.lightPathsNode );
     this.drawLight( model, crystalNode );
   }
 
+  /**
+   * Draws the light rays (incoming and outgoing) along with the path length difference (PLD) region if checked.
+   * Should one be called for the initial drawing. Otherwise use redrawLight.
+   * @param {XrayDiffractionModel} model
+   * @param {Node} crystalNode
+   * @public
+   */
   drawLight( model, crystalNode ) {
     const theta = model.sourceAngleProperty.get();
     const lamda = SCALE_FACTOR * model.sourceWavelengthProperty.get();

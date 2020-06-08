@@ -11,7 +11,6 @@ import Vector2 from '../../../../dot/js/Vector2.js';
 import Vector2Property from '../../../../dot/js/Vector2Property.js';
 import ScreenView from '../../../../joist/js/ScreenView.js';
 import Shape from '../../../../kite/js/Shape.js';
-
 import ArrowNode from '../../../../scenery-phet/js/ArrowNode.js';
 import ResetAllButton from '../../../../scenery-phet/js/buttons/ResetAllButton.js';
 import MeasuringTapeNode from '../../../../scenery-phet/js/MeasuringTapeNode.js';
@@ -56,7 +55,7 @@ class XrayDiffractionScreenView extends ScreenView {
     } );
 
     // @private
-    this.crystalNode = new CrystalNode( model.lattice );
+    this.crystalNode = new CrystalNode( model.lattice.sites, model.lattice.latticeConstantsProperty.value );
     this.crystalNode.centerX = 400;
     this.crystalNode.centerY = 450;
 
@@ -114,7 +113,7 @@ class XrayDiffractionScreenView extends ScreenView {
       model.lattice.latticeConstantsProperty.value.z = model.lattice.cConstantProperty.value;
       model.lattice.updateSites();
       this.removeChild( this.crystalNode );
-      this.crystalNode = new CrystalNode( model.lattice );
+      this.crystalNode = new CrystalNode( model.lattice.sites, model.lattice.latticeConstantsProperty.value );
       this.crystalNode.centerX = 400;
       this.crystalNode.centerY = 450;
       this.addChild( this.crystalNode );
@@ -125,7 +124,7 @@ class XrayDiffractionScreenView extends ScreenView {
     this.controlPanel.centerX = 900;
     this.addChild( this.controlPanel );
 
-    this.parameterPanel = new XrayParameterPanel( model );
+    this.parameterPanel = new XrayParameterPanel( model.lattice.latticeConstantsProperty, model.sourceAngleProperty, model.sourceWavelengthProperty );
     this.parameterPanel.centerX = 675;
     this.parameterPanel.bottom = this.layoutBounds.maxY - XrayDiffractionConstants.SCREEN_VIEW_Y_MARGIN;
     this.addChild( this.parameterPanel );
@@ -233,7 +232,7 @@ class XrayDiffractionScreenView extends ScreenView {
         this.reset();
         measuringTapeNode.reset();
         this.removeChild( this.crystalNode );
-        this.crystalNode = new CrystalNode( model.lattice );
+        this.crystalNode = new CrystalNode( model.lattice.sites, model.lattice.latticeConstantsProperty.value );
         this.crystalNode.centerX = 400;
         this.crystalNode.centerY = 450;
         this.addChild( this.crystalNode );

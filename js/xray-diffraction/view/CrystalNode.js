@@ -28,12 +28,13 @@ const SCALE_FACTOR = XrayDiffractionConstants.SCALE_FACTOR;
 
 class CrystalNode extends Node {
   /**
-   * @param { Object } lattice - describes lattice. lattice.sites is an Array of Vector2 points for the crystal lattice
+   * @param {Array.<Vector2>} sites - an Array of Vector2 points for the crystal lattice
+   * @param {Vector3} latticeConstants
    */
-  constructor( lattice ) {
+  constructor( sites, latticeConstants ) {
 
     //----------------------------------------------------------------------------------------
-    assert && assert( Array.isArray( lattice.sites ), `lattice.sites should be an Array: ${lattice.sites}` );
+    assert && assert( Array.isArray( sites ), `sites should be an Array: ${sites}` );
 
     super();
 
@@ -41,7 +42,7 @@ class CrystalNode extends Node {
     let xMin = 0;
     let yMin = 0;
 
-    lattice.sites.forEach( function( site ) {
+    sites.forEach( function( site ) {
       const atom = new Circle( RADIUS, {
         x: SCALE_FACTOR * site.x, y: SCALE_FACTOR * site.y,
         fill: new RadialGradient( 2, -3, 2, 2, -3, 7 )
@@ -56,12 +57,12 @@ class CrystalNode extends Node {
     this.addChild( atomsNode );
 
     // Label lattice constants
-    const aDimensionArrow = new ArrowNode( SCALE_FACTOR * xMin, SCALE_FACTOR * lattice.latticeConstantsProperty.value.z,
-      SCALE_FACTOR * ( xMin + lattice.latticeConstantsProperty.value.x ), SCALE_FACTOR * lattice.latticeConstantsProperty.value.z, DIMENSION_ARROW_OPTIONS );
+    const aDimensionArrow = new ArrowNode( SCALE_FACTOR * xMin, SCALE_FACTOR * latticeConstants.z,
+      SCALE_FACTOR * ( xMin + latticeConstants.x ), SCALE_FACTOR * latticeConstants.z, DIMENSION_ARROW_OPTIONS );
     const bDimensionArrow = new ArrowNode( SCALE_FACTOR * xMin, 0, SCALE_FACTOR * xMin,
-      SCALE_FACTOR * lattice.latticeConstantsProperty.value.z, DIMENSION_ARROW_OPTIONS );
+      SCALE_FACTOR * latticeConstants.z, DIMENSION_ARROW_OPTIONS );
     const dDimensionArrow = new ArrowNode( SCALE_FACTOR * xMin, SCALE_FACTOR * yMin, SCALE_FACTOR * xMin,
-      SCALE_FACTOR * ( yMin + lattice.latticeConstantsProperty.value.z ), DIMENSION_ARROW_OPTIONS );
+      SCALE_FACTOR * ( yMin + latticeConstants.z ), DIMENSION_ARROW_OPTIONS );
     this.addChild( aDimensionArrow );
     this.addChild( bDimensionArrow );
     this.addChild( dDimensionArrow );

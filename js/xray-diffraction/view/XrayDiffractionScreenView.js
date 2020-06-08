@@ -54,7 +54,7 @@ class XrayDiffractionScreenView extends ScreenView {
       tandem: tandem
     } );
 
-    // @private
+    // @private - used to display the array of atoms
     this.crystalNode = new CrystalNode( model.lattice.sites, model.lattice.latticeConstantsProperty.value );
     this.crystalNode.centerX = 400;
     this.crystalNode.centerY = 450;
@@ -120,10 +120,12 @@ class XrayDiffractionScreenView extends ScreenView {
       this.redrawLight( model, this.crystalNode );
     } );
 
+    // @private - used to create an input panel for users to adjust parameters of the simulation
     this.controlPanel = new XrayControlPanel( model );
     this.controlPanel.centerX = 900;
     this.addChild( this.controlPanel );
 
+    // @private - used to display detailed simultion parameters to the user
     this.parameterPanel = new XrayParameterPanel( model.lattice.latticeConstantsProperty, model.sourceAngleProperty, model.sourceWavelengthProperty );
     this.parameterPanel.centerX = 675;
     this.parameterPanel.bottom = this.layoutBounds.maxY - XrayDiffractionConstants.SCREEN_VIEW_Y_MARGIN;
@@ -209,6 +211,7 @@ class XrayDiffractionScreenView extends ScreenView {
 
     const toolboxNodes = [ protractorNodeIcon, measuringTapeIcon ];
 
+    // @private - used to display a toolbox containing a protractor and ruler for the user
     this.toolbox = new Panel( new VBox( {
       spacing: 10,
       children: toolboxNodes,
@@ -286,6 +289,7 @@ class XrayDiffractionScreenView extends ScreenView {
     let incidentRay1Start = new Vector2( 400, 0 );
     incidentRay1Start = incidentRay1End.minus( incidentRay1Start.rotated( model.sourceAngleProperty.get() ) );
 
+    // @private - used to draw the current frame of the light waves. Updated at each timestep when animating.
     this.lightPathsNode = new Node();
 
     // if checked, draw the Path Length Difference region

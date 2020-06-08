@@ -27,17 +27,19 @@ class XrayDiffractionModel {
     // @protected - used to signal when a sim step has occurred
     this.stepEmitter = new Emitter( { parameters: [ { valueType: 'number' } ] } );
 
-    // @public - these are the parameters set by the simulation's control panel
-    this.lattice = new Lattice( new Vector3( 3.82, 3.89, 7.8 ), 0 );
-    this.sourceAngleProperty = new NumberProperty( Math.PI / 3 );
-    this.sourceWavelengthProperty = new NumberProperty( 8 );
-    this.horizontalRaysProperty = new NumberProperty( 0 );
-    this.verticalRaysProperty = new NumberProperty( 2 );
-    this.animateProperty = new BooleanProperty( false );
-    this.pathDifferenceProperty = new BooleanProperty( false );
-    this.showParmsProperty = new BooleanProperty( false );
-    this.showWaveFrontsProperty = new BooleanProperty( false );
+    // @private - these are the parameters set by the simulation's control panel
+    // Default initial values are sometimes arbitrary, but chosen as noted below
+    this.lattice = new Lattice( new Vector3( 3.82, 3.89, 7.8 ), 0 ); // lattice constants for YBCO (High-Tc superconductor in Angstrom)
+    this.sourceAngleProperty = new NumberProperty( Math.PI / 3 ); // 60 degrees. Just looks good
+    this.sourceWavelengthProperty = new NumberProperty( 8 );  // My preference. Similar to but a little bigger than the c-lattice constant
+    this.horizontalRaysProperty = new NumberProperty( 0 );  // horizontal rays are a bit of a distraction at the beginning
+    this.verticalRaysProperty = new NumberProperty( 2 );  // Two vertical rays shows the path length difference (PLD) well
+    this.animateProperty = new BooleanProperty( false );  // Let the student turn on the animation. Will soon be replaced with a play button
+    this.pathDifferenceProperty = new BooleanProperty( false );  // Let the student turn it on so that they can think about it
+    this.showParmsProperty = new BooleanProperty( false );  // Numerical details better left for later
+    this.showWaveFrontsProperty = new BooleanProperty( false ); // Helps to explain the concept, but better left for later.
 
+    // @private - These are automatically calculated from other properties
     this.pLDProperty = new DerivedProperty( [ this.lattice.latticeConstantsProperty, this.sourceAngleProperty ],
       ( constants, theta ) => 2 * constants.z * Math.sin( theta ) );
     this.pLDWavelengthsProperty = new DerivedProperty( [ this.pLDProperty, this.sourceWavelengthProperty ],

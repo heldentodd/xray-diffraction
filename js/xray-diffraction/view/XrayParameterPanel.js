@@ -58,6 +58,7 @@ class XrayParameterPanel extends Panel {
 
     // Links the current incident angle, lattice parameters, wavelength, 2dsin(Theta), and 2dsin(Theta)/wavelength
     // to the text variables declared above
+    // This link exists for the entire duration of the sim. No need to dispose.
     Property.multilink( [
       sourceAngleProperty,
       latticeConstantsProperty,

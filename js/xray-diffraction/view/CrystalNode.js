@@ -22,16 +22,18 @@ const bLatticeConstantString = xrayDiffractionStrings.bLatticeConstant;
 const interplaneDistanceString = xrayDiffractionStrings.interplaneDistance;
 
 // constants
-const RADIUS = 5;   // Atomic Nucleus Radius
+const RADIUS = 5;   // Atomic Nucleus Radius. Arbitrarily set to look good
 const DIMENSION_ARROW_OPTIONS = { fill: 'black', stroke: null, tailWidth: 2, headWidth: 7, headHeight: 20, doubleHead: true };
 const SCALE_FACTOR = XrayDiffractionConstants.SCALE_FACTOR;
+const DIMENSION_LABEL_MAXWIDTH = 100; // arbitrary max width for labels
 
 class CrystalNode extends Node {
   /**
    * @param {Array.<Vector2>} sites - an Array of Vector2 points for the crystal lattice
    * @param {Vector3} latticeConstants
+   * @param {Object} [options]
    */
-  constructor( sites, latticeConstants ) {
+  constructor( sites, latticeConstants, options ) {
 
     //----------------------------------------------------------------------------------------
     assert && assert( Array.isArray( sites ), `sites should be an Array: ${sites}` );
@@ -45,7 +47,7 @@ class CrystalNode extends Node {
     sites.forEach( function( site ) {
       const atom = new Circle( RADIUS, {
         x: SCALE_FACTOR * site.x, y: SCALE_FACTOR * site.y,
-        fill: new RadialGradient( 2, -3, 2, 2, -3, 7 )
+        fill: new RadialGradient( 2, -3, 2, 2, -3, 7 ) // fill pattern to make the atoms look pretty
           .addColorStop( 0, '#f97d7d' )
           .addColorStop( 0.5, '#ed4545' )
           .addColorStop( 1, '#f00' )
@@ -66,20 +68,24 @@ class CrystalNode extends Node {
     this.addChild( aDimensionArrow );
     this.addChild( bDimensionArrow );
     this.addChild( dDimensionArrow );
-    const aDimensionLabel = new RichText( aLatticeConstantString, { maxWidth: 100, centerX: aDimensionArrow.centerX, top: aDimensionArrow.centerY } );
-    const bDimensionLabel = new RichText( bLatticeConstantString, { maxWidth: 100, centerY: bDimensionArrow.centerY, right: bDimensionArrow.centerX - 5 } );
-    const dDimensionLabel = new RichText( interplaneDistanceString, { maxWidth: 100, centerY: dDimensionArrow.centerY, right: dDimensionArrow.centerX - 5 } );
+    const aDimensionLabel = new RichText( aLatticeConstantString, { maxWidth: DIMENSION_LABEL_MAXWIDTH, centerX: aDimensionArrow.centerX, top: aDimensionArrow.centerY } );
+    const bDimensionLabel = new RichText( bLatticeConstantString, { maxWidth: DIMENSION_LABEL_MAXWIDTH, centerY: bDimensionArrow.centerY, right: bDimensionArrow.centerX - 5 } );
+    const dDimensionLabel = new RichText( interplaneDistanceString, { maxWidth: DIMENSION_LABEL_MAXWIDTH, centerY: dDimensionArrow.centerY, right: dDimensionArrow.centerX - 5 } );
 
-    // fake labels to keep field centered
+    // fake labels to expand symmetrically and keep the crystal centered
     const fakeLabel1 = new RichText( interplaneDistanceString,
-      { fill: 'white', maxWidth: 100, centerY: dDimensionArrow.centerY, left: -dDimensionArrow.centerX + 5 } );
+      { fill: 'transparent', maxWidth: DIMENSION_LABEL_MAXWIDTH, centerY: dDimensionArrow.centerY, left: -dDimensionArrow.centerX + 5 } );
     const fakeLabel2 = new RichText( aLatticeConstantString,
-      { fill: 'white', maxWidth: 100, centerX: aDimensionArrow.centerX, bottom: -aDimensionArrow.centerY } );
+      { fill: 'transparent', maxWidth: DIMENSION_LABEL_MAXWIDTH, centerX: aDimensionArrow.centerX, bottom: -aDimensionArrow.centerY } );
     this.addChild( aDimensionLabel );
     this.addChild( bDimensionLabel );
     this.addChild( dDimensionLabel );
     this.addChild( fakeLabel1 );
     this.addChild( fakeLabel2 );
+
+    // convenience specify through options the center of the node after everything has be added
+    this.centerX = options.centerX;
+    this.centerY = options.centerY;
   }
 }
 

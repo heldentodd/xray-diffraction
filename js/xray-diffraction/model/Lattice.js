@@ -37,6 +37,7 @@ class Lattice {
     assert && assert( orientation > -7 && orientation < 7, `Orientation (radians) normally < 2π: ${orientation}` );
 
     // @public {Vector3} the Lattice Constants of the sample (a, b, c) - if these change, updateSites should be called.
+    // These are needed for the entire life of the simulation, and thus are never disposed.
     this.aConstantProperty = new NumberProperty( latticeConstants.x );
     this.bConstantProperty = new NumberProperty( latticeConstants.y );
     this.cConstantProperty = new NumberProperty( latticeConstants.z );

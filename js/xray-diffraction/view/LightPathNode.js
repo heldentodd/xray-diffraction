@@ -85,7 +85,7 @@ class LightPathNode extends Node {
           ( firstWaveFrontLength - i * wavelength ) * sinTheta );
         this.addChild( new Path( Shape.lineSegment( startPoint.minus( waveFrontPosition ).plus( waveFrontAmp ),
           startPoint.minus( waveFrontPosition ).minus( waveFrontAmp ) ), {
-          stroke: 'hsl(' + ( ( 60 * i % 360 ) + 360 ) % 360 + ', 100%, 50%)',
+          stroke: 'hsl(' + ( ( 60 * i % 360 ) + 360 ) % 360 + ', 100%, 50%)', // gives 60*i gives 6 different colors
           lineWidth: 3
         } ) );
       }

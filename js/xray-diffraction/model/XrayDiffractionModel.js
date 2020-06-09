@@ -34,18 +34,20 @@ class XrayDiffractionModel {
     this.sourceWavelengthProperty = new NumberProperty( 8 );  // My preference. Similar to but a little bigger than the c-lattice constant
     this.horizontalRaysProperty = new NumberProperty( 0 );  // horizontal rays are a bit of a distraction at the beginning
     this.verticalRaysProperty = new NumberProperty( 2 );  // Two vertical rays shows the path length difference (PLD) well
-    this.animateProperty = new BooleanProperty( false );  // Let the student turn on the animation. Will soon be replaced with a play button
+    this.animateProperty = new BooleanProperty( false );  // Let the student turn on the animation. To be replaced with a play button
     this.pathDifferenceProperty = new BooleanProperty( false );  // Let the student turn it on so that they can think about it
     this.showParmsProperty = new BooleanProperty( false );  // Numerical details better left for later
     this.showWaveFrontsProperty = new BooleanProperty( false ); // Helps to explain the concept, but better left for later.
 
     // @private - These are automatically calculated from other properties
+    // They also exist for the entire life of the sim, so there is no need to dispose.
     this.pLDProperty = new DerivedProperty( [ this.lattice.latticeConstantsProperty, this.sourceAngleProperty ],
       ( constants, theta ) => 2 * constants.z * Math.sin( theta ) );
     this.pLDWavelengthsProperty = new DerivedProperty( [ this.pLDProperty, this.sourceWavelengthProperty ],
       ( pLD, wavelength ) => pLD / wavelength );
 
-    // @private - initial phase of the incoming beam. Starts as a cosine function. Probably wouldn't hurt to change this, but no real reason to do so.
+    // @private - initial phase of the incoming beam. Starts as a cosine function.
+    // Probably wouldn't hurt to change this, but no real reason to do so. It is updated by the step function.
     this.startPhase = 0;
   }
 
@@ -82,7 +84,8 @@ class XrayDiffractionModel {
    */
   step( dt ) {
     if ( this.animateProperty.value ) {
-      this.startPhase = this.startPhase - 3 * dt;
+      // The following sets the speed of light at 3 Angstrom/s (ω = 2πv/λ = 2π x 3/λ = 18.85/λ)
+      this.startPhase = this.startPhase - 19 / this.sourceWavelengthProperty.value * dt;
       this.stepEmitter.emit( dt );
     }
   }

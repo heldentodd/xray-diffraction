@@ -29,9 +29,6 @@ const pathDifferenceString = xrayDiffractionStrings.pathDifference;
 const showWavefrontsString = xrayDiffractionStrings.showWavefronts;
 const showParametersString = xrayDiffractionStrings.showParameters;
 
-// constants
-const textOptions = { maxWidth: 200 };
-
 class XrayControlPanel extends Panel {
 
   /**
@@ -40,6 +37,7 @@ class XrayControlPanel extends Panel {
 
   constructor( model ) {
 
+    const textOptions = { maxWidth: 200 };
     const angleTitle = new RichText( incidentAngleString, textOptions );
     const wavelengthTitle = new RichText( wavelengthString, textOptions );
     const horizontalTitle = new RichText( horizontalRaysString, textOptions );
@@ -80,7 +78,7 @@ class XrayControlPanel extends Panel {
     showParmsCheckbox.mouseArea = showParmsCheckbox.localBounds.dilated( 2 ).withX( separator.right );
     showParmsCheckbox.touchArea = showParmsCheckbox.mouseArea;
 
-    // Horizontal layout
+    // Horizontal layout - centered
     const centerX = angleControl.centerX;
     angleTitle.centerX = centerX;
     wavelengthControl.centerX = centerX;
@@ -115,13 +113,13 @@ class XrayControlPanel extends Panel {
       showParmsCheckbox.left
     ] );
 
-    // Align controls to the left
+    // Left align checkbox controls
     animateCheckbox.left = minX;
     pathDifferenceCheckbox.left = minX;
     showWaveFrontsCheckbox.left = minX;
     showParmsCheckbox.left = minX;
 
-    // Vertical layout
+    // Vertical layout - set manually
     angleTitle.centerY = 10;
     angleControl.top = angleTitle.bottom + 3;
     wavelengthTitle.top = angleControl.bottom + 7;

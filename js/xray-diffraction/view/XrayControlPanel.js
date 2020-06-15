@@ -37,6 +37,8 @@ const interplaneDistanceString = xrayDiffractionStrings.interplaneDistance;
 const horizontalRaysString = xrayDiffractionStrings.horizontalRays;
 const lengthUnitString = xrayDiffractionStrings.lengthUnit;
 const pathDifferenceString = xrayDiffractionStrings.pathDifference;
+const pLDString = xrayDiffractionStrings.pLD;
+const braggEquationString = xrayDiffractionStrings.braggEquation;
 const wavefrontsMarkersString = xrayDiffractionStrings.waveFrontMarkers;
 const verticalRaysString = xrayDiffractionStrings.verticalRays;
 const wavelengthString = xrayDiffractionStrings.wavelength;
@@ -244,10 +246,16 @@ class XrayControlPanel extends VBox {
       model.lattice.latticeConstantsProperty,
       model.sourceWavelengthProperty
     ], () => {
-      _2dSinText.text = '2' + interplaneDistanceString + ' sin(θ) = ' +
-                        Utils.toFixed( 2 * model.lattice.latticeConstantsProperty.value.z * Math.sin( model.sourceAngleProperty.value ), 1 ) + lengthUnitString;
-      _2dSinLambdaText.text = '2' + interplaneDistanceString + ' sin(θ)/λ = ' + Utils.toFixed(
-        2 * model.lattice.latticeConstantsProperty.value.z * Math.sin( model.sourceAngleProperty.value ) / model.sourceWavelengthProperty.value, 2 );
+      const _2dSinTheta = 2 * model.lattice.latticeConstantsProperty.value.z * Math.sin( model.sourceAngleProperty.value );
+      _2dSinText.text = StringUtils.fillIn( pLDString, {
+        interplaneDistance: interplaneDistanceString,
+        value: Utils.toFixed( _2dSinTheta, 1 ),
+        unit: lengthUnitString
+      } );
+      _2dSinLambdaText.text = StringUtils.fillIn( braggEquationString, {
+        interplaneDistance: interplaneDistanceString,
+        value: Utils.toFixed( _2dSinTheta / model.sourceWavelengthProperty.value, 2 )
+      } );
     } );
     model.pathDifferenceProperty.link( trueFalse => {
       if ( trueFalse ) {

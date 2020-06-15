@@ -47,6 +47,12 @@
   "inPhase": {
     "value": "In Phase! Pfadunterschied = {{wavelengths}}λ"
   },
+  "pLD": {
+    "value": "2{{interplaneDistance}} sin(θ) = {{value}}{{unit}}"
+  },
+  "braggEquation": {
+    "value": "2{{interplaneDistance}} sin(θ)/λ = {{value}}"
+  },
   "wavelengthUnit": {
     "value": "Å"
   }

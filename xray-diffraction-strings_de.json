@@ -3,10 +3,13 @@
     "value": "Röntgenbeugung"
   },
   "incidentAngle": {
-    "value": "Einfallswinkel"
+    "value": "Einfallswinkel: {{value}}{{units}}"
+  },
+  "angleUnit": {
+    "value": "°"
   },
   "wavelength": {
-    "value": "Wellenlänge"
+    "value": "Wellenlänge: {{value}}{{lengthUnit}}"
   },
   "horizontalRays": {
     "value": "Horizontale Strahlen"
@@ -20,31 +23,31 @@
   "bLatticeConstant": {
     "value": "b"
   },
+  "aLatticeEquals": {
+    "value": "a = {{value}}{{unit}}"
+  },
+  "bLatticeEquals": {
+    "value": "b = {{value}}{{unit}}"
+  },
+  "bdLatticeEquals": {
+    "value": "b = d = {{value}}{{unit}}"
+  },
   "interplaneDistance": {
     "value": "d"
-  },
-  "animate": {
-    "value": "Animieren"
   },
   "pathDifference": {
     "value": "Pfadunterschied"
   },
-  "showWavefronts": {
-    "value": "Wellenfronten anzeigen"
+  "showTransmitted": {
+    "value": "Sendestrahl"
   },
-  "showParameters": {
-    "value": "Parameter anzeigen"
+  "waveFrontMarkers": {
+    "value": "Wellenfrontindikatoren:"
   },
   "inPhase": {
-    "value": "In Phase!"
-  },
-  "pathDifferenceEquals": {
-    "value": "Pfadunterschied = "
+    "value": "In Phase! Pfadunterschied = {{wavelengths}}λ"
   },
   "wavelengthUnit": {
     "value": "Å"
-  },
-  "angleUnit": {
-    "value": "°"
   }
 }

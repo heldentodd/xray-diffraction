@@ -12,6 +12,7 @@ import Circle from '../../../../scenery/js/nodes/Circle.js';
 import Node from '../../../../scenery/js/nodes/Node.js';
 import RichText from '../../../../scenery/js/nodes/RichText.js';
 import RadialGradient from '../../../../scenery/js/util/RadialGradient.js';
+import Rectangle from '../../../../scenery/js/nodes/Rectangle.js';
 import XrayDiffractionConstants from '../../common/XrayDiffractionConstants.js';
 import xrayDiffraction from '../../xrayDiffraction.js';
 import xrayDiffractionStrings from '../../xrayDiffractionStrings.js';
@@ -43,6 +44,8 @@ class CrystalNode extends Node {
     const atomsNode = new Node();
     let xMin = 0;
     let yMin = 0;
+    let xMax = 0;
+    let yMax = 0;
 
     sites.forEach( function( site ) {
       const atom = new Circle( RADIUS, {
@@ -54,8 +57,14 @@ class CrystalNode extends Node {
       } );
       if ( site.x < xMin ) { xMin = site.x; }
       if ( site.y < yMin ) { yMin = site.y; }
+      if ( site.x > xMax ) { xMax = site.x; }
+      if ( site.y > yMax ) { yMax = site.y; }
       atomsNode.addChild( atom );
     } );
+
+    // add a rectangular shape to define the crystal
+    this.addChild( new Rectangle( SCALE_FACTOR * xMin - RADIUS, SCALE_FACTOR * yMin - RADIUS, SCALE_FACTOR * ( xMax - xMin ) + 2 * RADIUS,
+      SCALE_FACTOR * ( yMax - yMin ) + 2 * RADIUS, RADIUS, RADIUS, { fill: 'hsl(210,100%,95%)' } ) ); // light color picked by hand
     this.addChild( atomsNode );
 
     // Label lattice constants

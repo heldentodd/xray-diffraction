@@ -7,160 +7,313 @@
  */
 
 // modules
+import AccordionBox from '../../../../sun/js/AccordionBox.js';
 import Checkbox from '../../../../sun/js/Checkbox.js';
+import Dimension2 from '../../../../dot/js/Dimension2.js';
+import HBox from '../../../../scenery/js/nodes/HBox.js';
 import HSeparator from '../../../../sun/js/HSeparator.js';
-import HSlider from '../../../../sun/js/HSlider.js';
+import merge from '../../../../phet-core/js/merge.js';
 import Node from '../../../../scenery/js/nodes/Node.js';
+import NumberControl from '../../../../scenery-phet/js/NumberControl.js';
 import Panel from '../../../../sun/js/Panel.js';
+import Path from '../../../../scenery/js/nodes/Path.js';
+import PhetFont from '../../../../scenery-phet/js/PhetFont.js';
+import Property from '../../../../axon/js/Property.js';
+import RadioButtonGroup from '../../../../sun/js/buttons/RadioButtonGroup.js';
 import RangeWithValue from '../../../../dot/js/RangeWithValue.js';
-import RichText from '../../../../scenery/js/nodes/RichText.js';
+import Shape from '../../../../kite/js/Shape.js';
+import StringUtils from '../../../../phetcommon/js/util/StringUtils.js';
+import Text from '../../../../scenery/js/nodes/Text.js';
+import Utils from '../../../../dot/js/Utils.js';
+import VBox from '../../../../scenery/js/nodes/VBox.js';
 import xrayDiffraction from '../../xrayDiffraction.js';
 import xrayDiffractionStrings from '../../xrayDiffractionStrings.js';
 
 // strings
+const aLatticeEqualsString = xrayDiffractionStrings.aLatticeEquals;
+const bdLatticeEqualsString = xrayDiffractionStrings.bdLatticeEquals;
 const incidentAngleString = xrayDiffractionStrings.incidentAngle;
-const wavelengthString = xrayDiffractionStrings.wavelength;
+const interplaneDistanceString = xrayDiffractionStrings.interplaneDistance;
 const horizontalRaysString = xrayDiffractionStrings.horizontalRays;
-const verticalRaysString = xrayDiffractionStrings.verticalRays;
-const aLatticeConstantString = xrayDiffractionStrings.aLatticeConstant;
-const bLatticeConstantString = xrayDiffractionStrings.bLatticeConstant;
-const animateString = xrayDiffractionStrings.animate;
+const lengthUnitString = xrayDiffractionStrings.lengthUnit;
 const pathDifferenceString = xrayDiffractionStrings.pathDifference;
-const showWavefrontsString = xrayDiffractionStrings.showWavefronts;
-const showParametersString = xrayDiffractionStrings.showParameters;
+const wavefrontsMarkersString = xrayDiffractionStrings.waveFrontMarkers;
+const verticalRaysString = xrayDiffractionStrings.verticalRays;
+const wavelengthString = xrayDiffractionStrings.wavelength;
+const showTransmittedString = xrayDiffractionStrings.showTransmitted;
 
-class XrayControlPanel extends Panel {
+const TEXT_OPTIONS = { font: new PhetFont( { family: 'Verdana', size: 14 } ), maxWidth: 200, align: 'center', setBoundsMethod: 'accurate' };
+const SLIDER_OPTIONS = { trackSize: new Dimension2( 90, 1 ), thumbSize: new Dimension2( 13, 22 ) };
+
+class XrayControlPanel extends VBox {
 
   /**
    * @param {XrayDiffractionModel} model
+   * @param {Object} [options]
    */
 
-  constructor( model ) {
+  constructor( model, options ) {
 
-    const textOptions = { maxWidth: 200 };
-    const angleTitle = new RichText( incidentAngleString, textOptions );
-    const wavelengthTitle = new RichText( wavelengthString, textOptions );
-    const horizontalTitle = new RichText( horizontalRaysString, textOptions );
-    const verticalTitle = new RichText( verticalRaysString, textOptions );
-    const aLatticeTitle = new RichText( aLatticeConstantString, textOptions );
-    const bLatticeTitle = new RichText( bLatticeConstantString, textOptions );
-    const angleControl = new HSlider( model.sourceAngleProperty, new RangeWithValue( 0, Math.PI / 2, Math.PI / 3 ) );
-    const wavelengthControl = new HSlider( model.sourceWavelengthProperty, new RangeWithValue( 1, 20, 5 ) );
-    const horizontalControl = new HSlider( model.horizontalRaysProperty, new RangeWithValue( 0, 3.9, 0 ) );
-    const verticalControl = new HSlider( model.verticalRaysProperty, new RangeWithValue( 1, 7, 2 ) );
-    const aLatticeControl = new HSlider( model.lattice.aConstantProperty, new RangeWithValue( 2, 20, 3.8 ) );
-    const bLatticeControl = new HSlider( model.lattice.cConstantProperty, new RangeWithValue( 2, 20, 7.8 ) );
+    options = merge( {
+      xMargin: 15,
+      yMargin: 8,
+      fill: '#F0F0F0',
+      stroke: 'gray',
+      lineWidth: 1
+    }, options );
 
-    const animateCheckbox = new Checkbox( new RichText( animateString, textOptions ), model.animateProperty );
-    const pathDifferenceCheckbox = new Checkbox( new RichText( pathDifferenceString, textOptions ), model.pathDifferenceProperty );
-    const showWaveFrontsCheckbox = new Checkbox( new RichText( showWavefrontsString, textOptions ), model.showWaveFrontsProperty );
-    const showParmsCheckbox = new Checkbox( new RichText( showParametersString, textOptions ), model.showParmsProperty );
+    // We are manually controlling the title and the number rather than the built in NumberControl functionality so that
+    // we can convert from radians to degrees and accomodate right-to-left languages.
+    const angleTitle = new Text( '?', TEXT_OPTIONS );
+    // Links the current angle and converts it to degrees
+    const angleControl = new NumberControl( angleTitle.text, model.sourceAngleProperty, new RangeWithValue( 0, Math.PI / 2, Math.PI / 3 ),
+      {
+        delta: Math.PI / 900, // 0.2 degree resolution
+        sliderOptions: SLIDER_OPTIONS,
+        layoutFunction: createControlLayoutFunction( angleTitle )
+      } );
+    model.sourceAngleProperty.link( angle => {
+      angleTitle.text = StringUtils.fillIn( incidentAngleString, {
+        value: Utils.toFixed( angle * 180 / Math.PI, 1 ),
+        unit: xrayDiffractionStrings.angleUnit
+      } );
+    } );
 
-    const maxComponentWidth = _.max( [
-      animateCheckbox.width,
-      pathDifferenceCheckbox.width,
-      showWaveFrontsCheckbox.width,
-      showParmsCheckbox.width,
+    // Control for the wavelength
+    const wavelengthTitle = new Text( '?', TEXT_OPTIONS );
+    const wavelengthControl = new NumberControl( '?', model.sourceWavelengthProperty, new RangeWithValue( 1, 20, 5 ),
+      {
+        delta: 0.1, // 0.1 Angstrom resolution
+        sliderOptions: SLIDER_OPTIONS,
+        layoutFunction: createControlLayoutFunction( wavelengthTitle )
+      } );
+    model.sourceWavelengthProperty.link( wavelength => {
+      wavelengthTitle.text = StringUtils.fillIn( wavelengthString, {
+        value: wavelength,
+        unit: xrayDiffractionStrings.lengthUnit
+      } );
+    } );
+
+    // Control for the b lattice constant (= interplane distance for this orientation)
+    const bLatticeTitle = new Text( '?', TEXT_OPTIONS );
+    const bLatticeControl = new NumberControl( '?', model.lattice.cConstantProperty, new RangeWithValue( 2, 20, 7.8 ),
+      {
+        delta: 0.1, // 0.1 Angstrom resolution
+        sliderOptions: SLIDER_OPTIONS,
+        layoutFunction: createControlLayoutFunction( bLatticeTitle )
+      } );
+    model.lattice.cConstantProperty.link( constant => {
+      bLatticeTitle.text = StringUtils.fillIn( bdLatticeEqualsString, {
+        value: constant,
+        unit: xrayDiffractionStrings.lengthUnit
+      } );
+    } );
+
+    // Control for the a lattice constant
+    const aLatticeTitle = new Text( '?', TEXT_OPTIONS );
+    model.lattice.aConstantProperty.link( constant => {
+      aLatticeTitle.text = StringUtils.fillIn( aLatticeEqualsString, {
+        value: constant,
+        unit: xrayDiffractionStrings.lengthUnit
+      } );
+    } );
+    const aLatticeControl = new NumberControl( aLatticeTitle.text, model.lattice.aConstantProperty, new RangeWithValue( 2, 20, 3.8 ),
+      {
+        delta: 0.1, // 0.1 Angstrom resolution
+        sliderOptions: SLIDER_OPTIONS,
+        layoutFunction: createControlLayoutFunction( aLatticeTitle )
+      } );
+    model.lattice.aConstantProperty.link( constant => {
+      aLatticeTitle.text = StringUtils.fillIn( aLatticeEqualsString, {
+        value: constant,
+        unit: xrayDiffractionStrings.lengthUnit
+      } );
+    } );
+
+    // Control for number of vertical rays
+    const verticalControl = new NumberControl( '?', model.verticalRaysProperty, new RangeWithValue( 1, 5, 2 ),
+      {
+        delta: 1, // interger number of rays
+        sliderOptions: SLIDER_OPTIONS,
+        layoutFunction: createControlLayoutFunction( new Text( verticalRaysString, TEXT_OPTIONS ) )
+      } );
+
+    // Control for number of horizontal rays
+    const horizontalControl = new NumberControl( '?', model.horizontalRaysProperty, new RangeWithValue( 0, 2, 0 ),
+      {
+        delta: 1, // interger number of rays
+        sliderOptions: SLIDER_OPTIONS,
+        layoutFunction: createControlLayoutFunction( new Text( horizontalRaysString, TEXT_OPTIONS ) )
+      } );
+
+    const wavefrontRadioContent = [ // value set to color iterator used by LightPathNode or 'none' for no wavefronts
+      {
+        value: 'none',
+        node: createLines( () => 'transparent' )
+      },
+      {
+        value: () => 'black',
+        node: createLines( () => 'black' )
+      },
+      {
+        value: i => 'hsl(0, 0%, ' + ( 40 * ( ( ( i % 3 ) + 3 ) % 3 ) ) + '%)',
+        node: createLines( i => 'hsl(0, 0%, ' + ( 40 * ( ( ( i % 3 ) + 3 ) % 3 ) ) + '%)' ) // three levels, 0,40,80
+      },
+      {
+        value: i => 'hsl(' + ( ( 60 * i % 360 ) + 360 ) % 360 + ', 100%, 50%)',
+        node: createLines( i => 'hsl(' + ( ( 60 * i % 360 ) + 360 ) % 360 + ', 100%, 50%)' ) // 60*i gives 6 different colors ),
+      }
+    ];
+
+    const wavefrontRadioGroup = new RadioButtonGroup( model.wavefrontProperty, wavefrontRadioContent, {
+      orientation: 'horizontal',
+      cornerRadius: 5,
+      baseColor: 'white',
+      disabledBaseColor: 'white',
+      selectedLineWidth: 1,
+      selectedStroke: 'black',
+      deselectedLineWidth: 0,
+      deselectedContentOpacity: 1
+    } );
+
+    const pathDifferenceCheckbox = new Checkbox( new Text( pathDifferenceString, TEXT_OPTIONS ),
+      model.pathDifferenceProperty, { boxWidth: 15 } );
+    const showTransmittedCheckbox = new Checkbox( new Text( showTransmittedString, TEXT_OPTIONS ),
+      model.showTransmittedProperty, { boxWidth: 15 } );
+
+    const waveFrontMarkersTitle = new Text( wavefrontsMarkersString, TEXT_OPTIONS );
+
+    const separator = new HSeparator( _.max( [
       angleControl.width,
       wavelengthControl.width,
       horizontalControl.width,
-      verticalControl.width
-    ] );
-    const separator = new HSeparator( maxComponentWidth );
+      verticalControl.width,
+      aLatticeControl.width,
+      bLatticeControl.width,
+      pathDifferenceCheckbox.width,
+      waveFrontMarkersTitle.width
+    ] ) );
+    const separator2 = new HSeparator( separator.width );
 
     // Set pointer areas for the checkboxes, now that we have the separator dimensions.
-    animateCheckbox.mouseArea = animateCheckbox.localBounds.dilated( 2 ).withX( separator.right );
-    animateCheckbox.touchArea = animateCheckbox.mouseArea;
     pathDifferenceCheckbox.mouseArea = pathDifferenceCheckbox.localBounds.dilated( 2 ).withX( separator.right );
     pathDifferenceCheckbox.touchArea = pathDifferenceCheckbox.mouseArea;
-    showWaveFrontsCheckbox.mouseArea = showWaveFrontsCheckbox.localBounds.dilated( 2 ).withX( separator.right );
-    showWaveFrontsCheckbox.touchArea = showWaveFrontsCheckbox.mouseArea;
-    showParmsCheckbox.mouseArea = showParmsCheckbox.localBounds.dilated( 2 ).withX( separator.right );
-    showParmsCheckbox.touchArea = showParmsCheckbox.mouseArea;
+    showTransmittedCheckbox.mouseArea = showTransmittedCheckbox.localBounds.dilated( 2 ).withX( separator.right );
+    showTransmittedCheckbox.touchArea = showTransmittedCheckbox.mouseArea;
 
-    // Horizontal layout - centered
-    const centerX = angleControl.centerX;
-    angleTitle.centerX = centerX;
-    wavelengthControl.centerX = centerX;
-    wavelengthTitle.centerX = centerX;
-    horizontalTitle.centerX = centerX;
-    horizontalControl.centerX = centerX;
-    verticalTitle.centerX = centerX;
-    verticalControl.centerX = centerX;
-    aLatticeTitle.centerX = centerX;
-    bLatticeTitle.centerX = centerX;
-    aLatticeControl.centerX = centerX;
-    bLatticeControl.centerX = centerX;
-    separator.centerX = centerX;
-    animateCheckbox.centerX = centerX;
-    pathDifferenceCheckbox.centerX = centerX;
-    showWaveFrontsCheckbox.centerX = centerX;
-    showParmsCheckbox.centerX = centerX;
+    // main control panel. Items can easily be rearranged here. Use Panel if you have to set a width inside a VBox.
+    const checkboxes = new VBox( {
+      align: 'left',
+      children: [ separator, pathDifferenceCheckbox, showTransmittedCheckbox, separator2 ],
+      spacing: 5
+    } );
+    const content = new VBox( {
+      align: 'center',
+      children: [ angleControl, wavelengthControl, bLatticeControl, checkboxes, waveFrontMarkersTitle, wavefrontRadioGroup ],
+      spacing: 5
+    } );
+    const mainContent = new Panel( content, options );
 
-    const minX = _.min( [
-      angleControl.left,
-      angleTitle.left,
-      wavelengthControl.left,
-      wavelengthTitle.left,
-      horizontalTitle.left,
-      horizontalControl.left,
-      verticalTitle.left,
-      verticalControl.left,
-      separator.left,
-      animateCheckbox.left,
-      pathDifferenceCheckbox.left,
-      showWaveFrontsCheckbox.left,
-      showParmsCheckbox.left
-    ] );
+    // optional controls hidden in an accordian box
+    const optionalParameters = new VBox( {
+      align: 'center',
+      children: [ aLatticeControl, verticalControl, horizontalControl ],
+      spacing: 5
+    } );
 
-    // Left align checkbox controls
-    animateCheckbox.left = minX;
-    pathDifferenceCheckbox.left = minX;
-    showWaveFrontsCheckbox.left = minX;
-    showParmsCheckbox.left = minX;
+    const accordianOptional = new AccordionBox( optionalParameters, merge( {
+      titleNode: new Text( 'More Parameters', TEXT_OPTIONS ),
+      minWidth: mainContent.width,
+      expandedProperty: model.moreParmsExpandedProperty,
+      showTitleWhenExpanded: true
+    }, options ) );
 
-    // Vertical layout - set manually
-    angleTitle.centerY = 10;
-    angleControl.top = angleTitle.bottom + 3;
-    wavelengthTitle.top = angleControl.bottom + 7;
-    wavelengthControl.top = wavelengthTitle.bottom + 3;
-    horizontalTitle.top = wavelengthControl.bottom + 7;
-    horizontalControl.top = horizontalTitle.bottom + 3;
-    verticalTitle.top = horizontalControl.bottom + 7;
-    verticalControl.top = verticalTitle.bottom + 3;
-    aLatticeTitle.top = verticalControl.bottom + 7;
-    aLatticeControl.top = aLatticeTitle.bottom + 3;
-    bLatticeTitle.top = aLatticeControl.bottom + 7;
-    bLatticeControl.top = bLatticeTitle.bottom + 3;
+    // Text nodes that reflects the incident angle, lattice parameters, wavelength, 2dsin(Theta), and 2dsin(Theta)/wavelength
+    const _2dSinText = new Text( '?', TEXT_OPTIONS );
+    const _2dSinLambdaText = new Text( '?', TEXT_OPTIONS );
+    const equationPanel = new Panel( new VBox( { children: [ ( _2dSinText ), ( _2dSinLambdaText ) ] } ), {
+      align: 'center',
+      minWidth: separator.width
+    } );
 
-    const HORIZONTAL_SEPARATOR_MARGIN = 7;
-    separator.top = bLatticeControl.bottom + 5;
-    animateCheckbox.top = separator.bottom + HORIZONTAL_SEPARATOR_MARGIN;
-    pathDifferenceCheckbox.top = animateCheckbox.bottom + HORIZONTAL_SEPARATOR_MARGIN;
-    showWaveFrontsCheckbox.top = pathDifferenceCheckbox.bottom + HORIZONTAL_SEPARATOR_MARGIN;
-    showParmsCheckbox.top = showWaveFrontsCheckbox.bottom + HORIZONTAL_SEPARATOR_MARGIN;
+    // Links the current incident angle, lattice parameters, wavelength, 2dsin(Theta), and 2dsin(Theta)/wavelength
+    // to the text variables declared above
+    // This link exists for the entire duration of the sim. No need to dispose.
+    Property.multilink( [
+      model.sourceAngleProperty,
+      model.lattice.latticeConstantsProperty,
+      model.sourceWavelengthProperty
+    ], () => {
+      _2dSinText.text = '2' + interplaneDistanceString + ' sin(θ) = ' +
+                        Utils.toFixed( 2 * model.lattice.latticeConstantsProperty.value.z * Math.sin( model.sourceAngleProperty.value ), 1 ) + lengthUnitString;
+      _2dSinLambdaText.text = '2' + interplaneDistanceString + ' sin(θ)/λ = ' + Utils.toFixed(
+        2 * model.lattice.latticeConstantsProperty.value.z * Math.sin( model.sourceAngleProperty.value ) / model.sourceWavelengthProperty.value, 2 );
+    } );
+    model.pathDifferenceProperty.link( trueFalse => {
+      if ( trueFalse ) {
+        checkboxes.insertChild( checkboxes.indexOfChild( pathDifferenceCheckbox ) + 1, ( equationPanel ) );
+      }
+      else {
+        if ( checkboxes.hasChild( equationPanel ) ) {
+          checkboxes.removeChild( equationPanel );
+        }
+      }
+    } );
 
-    const container = new Node();
-    container.addChild( angleTitle );
-    container.addChild( angleControl );
-    container.addChild( wavelengthTitle );
-    container.addChild( wavelengthControl );
-    container.addChild( horizontalTitle );
-    container.addChild( horizontalControl );
-    container.addChild( verticalTitle );
-    container.addChild( verticalControl );
-    container.addChild( aLatticeTitle );
-    container.addChild( aLatticeControl );
-    container.addChild( bLatticeTitle );
-    container.addChild( bLatticeControl );
-    container.addChild( separator );
-    container.addChild( animateCheckbox );
-    container.addChild( pathDifferenceCheckbox );
-    container.addChild( showWaveFrontsCheckbox );
-    container.addChild( showParmsCheckbox );
-
-    super( container );
+    super( {
+      children: [ mainContent, accordianOptional ],
+      spacing: 5
+    } );
   }
+}
+
+/**
+ * Creates a layout functions that can be used for options.layoutFunction. Sends in a titleTextNode so we can change it later.
+ * Arranges subcomponents like this:
+ *
+ *        title
+ *  < ------|------ >
+ *
+ * @param {Node} titleTextNode
+ * @param {Object} [options]
+ * @returns {function}
+ * @public
+ * @static
+ */
+function createControlLayoutFunction( titleTextNode, options ) {
+  return ( titleNode, numberDisplay, slider, leftArrowButton, rightArrowButton ) => {
+    return new VBox( {
+      spacing: 2,
+      children: [ titleTextNode,
+        new HBox( {
+          spacing: 2,
+          resize: false, // prevent slider from causing a resize when thumb is at min or max
+          children: [ leftArrowButton, slider, rightArrowButton ]
+        } )
+      ]
+    } );
+  };
+}
+
+/**
+ * Creates lines symbols for wavefront markers radioButton.
+ *
+ * @param {function} interationFunction
+ * @returns {Node}
+ * @public
+ * @static
+ */// function to create lines symbols for wavefront markers radioButton
+function createLines( interationFunction ) {
+  const height = 20; // arbitrary size of icon. set by hand
+  const spacing = height / 4; // square icon for 4 wavefronts. set by hand
+  const linesNode = new Node();
+  for ( let i = 0; i < 4; i++ ) {
+    linesNode.addChild( new Path( Shape.lineSegment( i * spacing, 0, i * spacing, height ), {
+      stroke: interationFunction( i ), // defines the color/shading patterns
+      lineWidth: 3  // arbitrary linewidth for the icon
+    } ) );
+  }
+  return linesNode;
 }
 
 xrayDiffraction.register( 'XrayControlPanel', XrayControlPanel );

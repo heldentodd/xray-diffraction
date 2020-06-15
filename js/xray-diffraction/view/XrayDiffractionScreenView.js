@@ -6,7 +6,6 @@
 
 import BooleanProperty from '../../../../axon/js/BooleanProperty.js';
 import Property from '../../../../axon/js/Property.js';
-import Utils from '../../../../dot/js/Utils.js';
 import Vector2 from '../../../../dot/js/Vector2.js';
 import Vector2Property from '../../../../dot/js/Vector2Property.js';
 import ScreenView from '../../../../joist/js/ScreenView.js';
@@ -20,7 +19,11 @@ import Path from '../../../../scenery/js/nodes/Path.js';
 import RichText from '../../../../scenery/js/nodes/RichText.js';
 import VBox from '../../../../scenery/js/nodes/VBox.js';
 import Panel from '../../../../sun/js/Panel.js';
+import Rectangle from '../../../../scenery/js/nodes/Rectangle.js';
+import StringUtils from '../../../../phetcommon/js/util/StringUtils.js';
 import Tandem from '../../../../tandem/js/Tandem.js';
+import TimeControlNode from '../../../../scenery-phet/js/TimeControlNode.js';
+import Utils from '../../../../dot/js/Utils.js';
 import XrayDiffractionConstants from '../../common/XrayDiffractionConstants.js';
 import xrayDiffraction from '../../xrayDiffraction.js';
 import xrayDiffractionStrings from '../../xrayDiffractionStrings.js';
@@ -29,19 +32,17 @@ import CrystalNode from './CrystalNode.js';
 import LightPathNode from './LightPathNode.js';
 import ProtractorNode from './ProtractorNode.js';
 import XrayControlPanel from './XrayControlPanel.js';
-import XrayParameterPanel from './XrayParameterPanel.js';
 
 // strings
 const interplaneDistanceString = xrayDiffractionStrings.interplaneDistance;
 const inPhaseString = xrayDiffractionStrings.inPhase;
-const pathDifferenceEqualsString = xrayDiffractionStrings.pathDifferenceEquals;
 
 const DIMENSION_ARROW_OPTIONS = { fill: 'black', stroke: null, tailWidth: 2, headWidth: 7, headHeight: 20, doubleHead: true };
 const AMP = 10;
 const SCALE_FACTOR = XrayDiffractionConstants.SCALE_FACTOR;
 const TOP_RAY_LENGTH = 400; // Arbitrary length of top incident ray to start it near the top left
 // Arbitrary location of the crystal near the bottom center
-const CRYSTAL_NODE_OPTIONS = { centerX: 400, centerY: 450 };
+const CRYSTAL_NODE_OPTIONS = { centerX: 400, centerY: 440 };
 
 class XrayDiffractionScreenView extends ScreenView {
 
@@ -62,100 +63,31 @@ class XrayDiffractionScreenView extends ScreenView {
 
     this.addChild( this.crystalNode );
 
+    // Initial drawing of light onto the screen.
     this.drawLight( model, this.crystalNode );
 
-    // update when angle changes
-    // listener created once and needed for life of simulation. No need to dispose.
-    model.sourceAngleProperty.changedEmitter.addListener( () => {
-      this.redrawLight( model, this.crystalNode );
-    } );
-
-    // max width set to 260 which is less than the exit ray length
-    const inPhaseText = new RichText( '', { maxWidth: 260 } );
-    this.addChild( inPhaseText );
-
-    // displays message when path length difference (PLD) is integral multiple of the wavelength
-    // listener created once and needed for life of simulation. No need to dispose.
-    model.pLDWavelengthsProperty.changedEmitter.addListener( () => {
-      if ( Math.abs( model.pLDWavelengthsProperty.value - Utils.roundSymmetric( model.pLDWavelengthsProperty.value ) ) < 0.015 ) {
-
-        // reorient text and make it visible
-        const theta = model.sourceAngleProperty.get();
-        const rayTextEnd = new Vector2( this.crystalNode.centerX, this.crystalNode.centerY ).minus( model.lattice.sites[ 0 ].timesScalar( SCALE_FACTOR ) );
-
-        // find the center of the top outgoing ray and displace the text a little above it
-        let rayTextCenter = new Vector2( TOP_RAY_LENGTH / 2, 0 );
-        rayTextCenter = rayTextEnd.minus( rayTextCenter.rotated( Math.PI - theta ) );
-        if ( model.showWaveFrontsProperty.value ) {
-          // calculate the distance between light rays
-          const raySep = 4 * ( model.lattice.latticeConstantsProperty.value.z * Math.cos( theta ) );
-          // placement right above the wavefronts
-          rayTextCenter = rayTextCenter.addXY( -( raySep + AMP ) * Math.sin( theta ), -( raySep + AMP ) * Math.cos( theta ) );
+    // @protected Time Controls - subclass is responsible for play/pause of light animation
+    this.timeControlNode = new TimeControlNode( model.animateProperty, {
+      buttonGroupXSpacing: 25,
+      playPauseStepButtonOptions: {
+        stepForwardButtonOptions: {
+          // when the Step button is pressed
+          listener: () => {
+            // .04 s - about 2 timesteps seems about right
+            model.manualStep( .04 );
+            this.redrawLight( model, this.crystalNode );
+          }
         }
-        else {
-          // placement a little above the top of the wave 2.2 is arbitrary to put the text center high enough
-          rayTextCenter = rayTextCenter.addXY( -2.2 * AMP * Math.sin( theta ), -2.2 * AMP * Math.cos( theta ) );
-        }
-        inPhaseText.rotation = -model.sourceAngleProperty.value;
-        inPhaseText.text = inPhaseString + ' ' + pathDifferenceEqualsString + Utils.toFixed( model.pLDWavelengthsProperty.value, 0 ) + ' λ';
-        inPhaseText.center = rayTextCenter;
-      }
-      else {
-        inPhaseText.text = '';
-      }
+      },
+      tandem: tandem.createTandem( 'timeControlNode' )
     } );
-
-    // update display when wavelength, ray grid, or path difference checkbox changes
-    // This link exists for the entire duration of the sim. No need to dispose.
-    Property.multilink( [
-      model.sourceWavelengthProperty,
-      model.horizontalRaysProperty,
-      model.verticalRaysProperty,
-      model.showWaveFrontsProperty,
-      model.pathDifferenceProperty
-    ], () => { this.redrawLight( model, this.crystalNode ); } );
-
-    // update crystal when lattice parameters change
-    // This link exists for the entire duration of the sim. No need to dispose.
-    Property.multilink( [
-      model.lattice.aConstantProperty,
-      model.lattice.cConstantProperty
-    ], () => {
-      model.lattice.latticeConstantsProperty.value.x = model.lattice.aConstantProperty.value;
-      model.lattice.latticeConstantsProperty.value.z = model.lattice.cConstantProperty.value;
-      model.lattice.updateSites();
-      this.removeChild( this.crystalNode );
-      this.crystalNode = new CrystalNode( model.lattice.sites, model.lattice.latticeConstantsProperty.value, CRYSTAL_NODE_OPTIONS );
-      this.addChild( this.crystalNode );
-      this.redrawLight( model, this.crystalNode );
-    } );
-
-    // @private - used to create an input panel for users to adjust parameters of the simulation
-    this.controlPanel = new XrayControlPanel( model );
-    // Arbitrary location for the contral panel at the top right
-    this.controlPanel.centerX = 900;
-    this.addChild( this.controlPanel );
-
-    // @private - used to display detailed simultion parameters to the user
-    this.parameterPanel = new XrayParameterPanel( model.lattice.latticeConstantsProperty, model.sourceAngleProperty, model.sourceWavelengthProperty );
-    // Arbitrary location for the parameter panel at the bottom between the control panel and crystal
-    this.parameterPanel.centerX = 675;
-    this.parameterPanel.bottom = this.layoutBounds.maxY - XrayDiffractionConstants.SCREEN_VIEW_Y_MARGIN;
-    this.addChild( this.parameterPanel );
-
-    // This link exists for the entire duration of the sim. No need to dispose.
-    model.showParmsProperty.linkAttribute( this.parameterPanel, 'visible' );
-
-    // update view on model step
-    model.addStepListener( () => {
-      if ( model.animateProperty ) {
-        this.redrawLight( model, this.crystalNode );
-      }
-    } );
+    // layout positioning done after control panel is created
+    this.addChild( this.timeControlNode );
 
     // create the protractor node
     const showProtractorProperty = new BooleanProperty( false );
     const protractorNode = new ProtractorNode( showProtractorProperty, true, { scale: 0.8 } );
+    protractorNode.protractorAngleProperty.value = Math.PI / 2;
     const protractorPositionProperty = new Vector2Property( protractorNode.center );
     // This link exists for the entire duration of the sim. No need to dispose.
     showProtractorProperty.linkAttribute( protractorNode, 'visible' );
@@ -217,7 +149,6 @@ class XrayDiffractionScreenView extends ScreenView {
     measuringTapeNode.visible = false;
 
     initializeIcon( measuringTapeIcon, isMeasuringTapeInPlayAreaProperty, event => {
-
       // When clicking on the measuring tape icon, base point at cursor
       const delta = measuringTapeNode.tipPositionProperty.value.minus( measuringTapeNode.basePositionProperty.value );
       measuringTapeNode.basePositionProperty.value = measuringTapeNode.globalToParentPoint( event.pointer.point );
@@ -246,6 +177,94 @@ class XrayDiffractionScreenView extends ScreenView {
     this.addChild( protractorNode );
     this.addChild( measuringTapeNode );
 
+    // update when angle changes
+    // listener created once and needed for life of simulation. No need to dispose.
+    model.sourceAngleProperty.changedEmitter.addListener( () => {
+      this.redrawLight( model, this.crystalNode );
+    } );
+
+    // max width set to 260 which is less than the exit ray length
+    const inPhaseText = new RichText( '', { maxWidth: 260 } );
+    this.addChild( inPhaseText );
+
+    // displays message when path length difference (PLD) is integral multiple of the wavelength
+    // listener created once and needed for life of simulation. No need to dispose.
+    model.inPhaseProperty.changedEmitter.addListener( () => {
+      if ( model.inPhaseProperty.value ) {
+
+        // reorient text and make it visible
+        const theta = model.sourceAngleProperty.get();
+        const rayTextEnd = new Vector2( this.crystalNode.centerX, this.crystalNode.centerY ).minus( model.lattice.sites[ 0 ].timesScalar( SCALE_FACTOR ) );
+
+        // find the center of the top outgoing ray and displace the text a little above it
+        let rayTextCenter = new Vector2( TOP_RAY_LENGTH / 2, 0 );
+        rayTextCenter = rayTextEnd.minus( rayTextCenter.rotated( Math.PI - theta ) );
+        if ( model.wavefrontProperty.value === 'none' ) {
+          // placement a little above the top of the wave 2.2 is arbitrary to put the text center high enough
+          rayTextCenter = rayTextCenter.addXY( -2.2 * AMP * Math.sin( theta ), -2.2 * AMP * Math.cos( theta ) );
+        }
+        else {
+          // calculate the distance between light rays
+          const raySep = 4 * ( model.lattice.latticeConstantsProperty.value.z * Math.cos( theta ) );
+          // placement right above the wavefronts
+          rayTextCenter = rayTextCenter.addXY( -( raySep + AMP ) * Math.sin( theta ), -( raySep + AMP ) * Math.cos( theta ) );
+        }
+        inPhaseText.rotation = -model.sourceAngleProperty.value;
+        inPhaseText.text = StringUtils.fillIn( inPhaseString, {
+          wavelengths: Utils.toFixed( model.pLDWavelengthsProperty.value, 0 )
+        } );
+        inPhaseText.center = rayTextCenter;
+      }
+      else {
+        inPhaseText.text = '';
+      }
+    } );
+
+    // update display when wavelength, ray grid, or path difference checkbox changes
+    // This link exists for the entire duration of the sim. No need to dispose.
+    Property.multilink( [
+      model.sourceWavelengthProperty,
+      model.horizontalRaysProperty,
+      model.verticalRaysProperty,
+      model.wavefrontProperty,
+      model.pathDifferenceProperty,
+      model.showTransmittedProperty
+    ], () => { this.redrawLight( model, this.crystalNode ); } );
+
+    // update crystal when lattice parameters change
+    // This link exists for the entire duration of the sim. No need to dispose.
+    Property.multilink( [
+      model.lattice.aConstantProperty,
+      model.lattice.cConstantProperty
+    ], () => {
+      model.lattice.latticeConstantsProperty.value.x = model.lattice.aConstantProperty.value;
+      model.lattice.latticeConstantsProperty.value.z = model.lattice.cConstantProperty.value;
+      model.lattice.updateSites();
+      this.removeChild( this.crystalNode );
+      this.crystalNode = new CrystalNode( model.lattice.sites, model.lattice.latticeConstantsProperty.value, CRYSTAL_NODE_OPTIONS );
+      this.addChild( this.crystalNode );
+      this.redrawLight( model, this.crystalNode );
+      protractorNode.moveToFront();
+      measuringTapeNode.moveToFront();
+    } );
+
+    // @private - used to create an input panel for users to adjust parameters of the simulation
+    this.controlPanel = new XrayControlPanel( model );
+
+    // Layout for controls done manually at the top right
+    this.timeControlNode.top = XrayDiffractionConstants.SCREEN_VIEW_Y_MARGIN;
+    this.controlPanel.right = this.layoutBounds.maxX - XrayDiffractionConstants.SCREEN_VIEW_X_MARGIN;
+    this.timeControlNode.left = this.controlPanel.left;
+    this.controlPanel.top = this.timeControlNode.bottom + 5;
+    this.addChild( this.controlPanel );
+
+    // update view on model step
+    model.addStepListener( () => {
+      if ( model.animateProperty ) {
+        this.redrawLight( model, this.crystalNode );
+      }
+    } );
+
     const resetAllButton = new ResetAllButton( {
       listener: () => {
         this.interruptSubtreeInput(); // cancel interactions that may be in progress
@@ -257,10 +276,12 @@ class XrayDiffractionScreenView extends ScreenView {
         this.addChild( this.crystalNode );
         this.redrawLight( model, this.crystalNode );
         showProtractorProperty.reset();
-        protractorNode.reset();
+        protractorNode.protractorAngleProperty.value = Math.PI / 2;
+        protractorNode.moveToFront();
         isMeasuringTapeInPlayAreaProperty.value = false;
         measuringTapeNode.visible = false;
         measuringTapeNode.reset();
+        measuringTapeNode.moveToFront();
       },
       right: this.layoutBounds.maxX - XrayDiffractionConstants.SCREEN_VIEW_X_MARGIN,
       bottom: this.layoutBounds.maxY - XrayDiffractionConstants.SCREEN_VIEW_Y_MARGIN,
@@ -310,6 +331,57 @@ class XrayDiffractionScreenView extends ScreenView {
     // @private - used to draw the current frame of the light waves. Updated at each timestep when animating.
     this.lightPathsNode = new Node();
 
+    // Main logic to draw the light rays
+    const horiz = Math.floor( Math.min( model.horizontalRaysProperty.get(), 20 / model.lattice.latticeConstantsProperty.get().x ) );
+    const vert = Math.min( Math.floor( model.verticalRaysProperty.get() ),
+      1 + 2 * Math.floor( 20 / model.lattice.latticeConstantsProperty.get().z ) );
+    for ( let i = -horiz; i <= horiz; i++ ) {
+      for ( let j = 0; j < vert; j++ ) {
+        const shift = new Vector2( SCALE_FACTOR * i * model.lattice.latticeConstantsProperty.get().x,
+          -SCALE_FACTOR * j * model.lattice.latticeConstantsProperty.get().z );
+        const distance = SCALE_FACTOR * ( i * model.lattice.latticeConstantsProperty.get().x * Math.sin( theta )
+                                          + j * model.lattice.latticeConstantsProperty.get().z * Math.cos( theta ) );
+        const incidentRayStart = new Vector2( incidentRay1Start.x - distance * Math.sin( theta ),
+          incidentRay1Start.y + distance * Math.cos( theta ) );
+        const incidentRayEnd = incidentRay1End.minus( shift );
+        const incidentRayLength = incidentRayEnd.minus( incidentRayStart ).getMagnitude();
+        const exitRayPhase = ( incidentRayLength / lamda ) * 2 * Math.PI + model.startPhase;
+        const extraLength = 2 * SCALE_FACTOR * Math.cos( theta ) * i * model.lattice.latticeConstantsProperty.get().x; // accomodates extra length for added horizontal rays
+        const exitRayEnd = new Vector2( 2 * incidentRayEnd.x - incidentRayStart.x + extraLength * Math.cos( theta ),
+          incidentRayStart.y - extraLength * Math.sin( theta ) );
+        this.lightPathsNode.addChild( new LightPathNode( incidentRayStart, incidentRayEnd, SCALE_FACTOR * model.sourceWavelengthProperty.get(), {
+          amplitude: AMP,
+          startPhase: model.startPhase,
+          waveFrontWidth: ( model.wavefrontProperty.value === 'none' ) ? 0 : Math.max( AMP, raySeparation - 2 ),
+          waveFrontPattern: model.wavefrontProperty.value
+        } ) );
+        this.lightPathsNode.addChild( new LightPathNode( incidentRayEnd, exitRayEnd, SCALE_FACTOR * model.sourceWavelengthProperty.get(), {
+          amplitude: AMP,
+          startPhase: exitRayPhase,
+          waveFrontWidth: ( model.wavefrontProperty.value === 'none' ) ? 0 : Math.max( AMP, raySeparation - 2 ),
+          waveFrontPattern: model.wavefrontProperty.value,
+          stroke: ( model.inPhaseProperty.value ) ? 'black' : 'gray',
+          lineWidth: ( model.inPhaseProperty.value ) ? 2 : 1,
+          waveFrontLineWidth: ( model.inPhaseProperty.value ) ? 3 : 1
+        } ) );
+
+        if ( model.showTransmittedProperty.value ) {
+          // when incident ray is longer, transmitted ray is shorter
+          let transmittedRayEnd = new Vector2( 2 * TOP_RAY_LENGTH - incidentRayLength, 0 );
+          transmittedRayEnd = incidentRayEnd.minus( transmittedRayEnd.rotated( model.sourceAngleProperty.get() + Math.PI ) );
+          this.lightPathsNode.addChild( new LightPathNode( incidentRayEnd, transmittedRayEnd, SCALE_FACTOR * model.sourceWavelengthProperty.get(), {
+            amplitude: AMP,
+            startPhase: exitRayPhase,
+            waveFrontWidth: ( model.wavefrontProperty.value === 'none' ) ? 0 : Math.max( AMP, raySeparation - 2 ),
+            waveFrontPattern: model.wavefrontProperty.value,
+            stroke: ( model.inPhaseProperty.value ) ? 'hsl(0,0%,25%)' : 'black',
+            lineWidth: ( model.inPhaseProperty.value ) ? 1.5 : 2,
+            waveFrontLineWidth: ( model.inPhaseProperty.value ) ? 2 : 3
+          } ) );
+        }
+      }
+    }
+
     // if checked, draw the Path Length Difference region
     if ( model.pathDifferenceProperty.value ) {
       const dSinTheta = SCALE_FACTOR * ( model.lattice.latticeConstantsProperty.value.z * Math.sin( theta ) );
@@ -353,41 +425,18 @@ class XrayDiffractionScreenView extends ScreenView {
       const pLDLabelCenter = pLDArrowStart.plusXY( 5 * Math.sin( theta ) - ( dSinTheta * Math.cos( theta ) ) / 2,
         5 * Math.cos( theta ) + ( dSinTheta * Math.sin( theta ) ) / 2 );
       const pLDDimensionArrow = new ArrowNode( pLDArrowStart.x, pLDArrowStart.y, pLDArrowEnd.x, pLDArrowEnd.y, DIMENSION_ARROW_OPTIONS );
-      this.lightPathsNode.addChild( pLDDimensionArrow );
+
       const pLDDimensionLabel = new RichText( interplaneDistanceString + '<i>sin</i>(θ)',
         { maxWidth: 200, left: pLDLabelCenter.x, centerY: pLDLabelCenter.y } );
+      // add a translucent white background behind the label text - could also use BackgroundNode
+      const pLDLabelBackground = new Rectangle( pLDDimensionLabel.x, pLDDimensionLabel.top,
+        pLDDimensionLabel.width + 2, pLDDimensionLabel.height + 2, 4, 4, {
+          fill: 'white',
+          opacity: 0.6
+        } );
+      this.lightPathsNode.addChild( pLDLabelBackground );
       this.lightPathsNode.addChild( pLDDimensionLabel );
-    }
-
-    // Main logic to draw the light rays
-    const horiz = Math.floor( Math.min( model.horizontalRaysProperty.get(), 20 / model.lattice.latticeConstantsProperty.get().x ) );
-    const vert = Math.min( Math.floor( model.verticalRaysProperty.get() ),
-      1 + 2 * Math.floor( 20 / model.lattice.latticeConstantsProperty.get().z ) );
-    for ( let i = -horiz; i <= horiz; i++ ) {
-      for ( let j = 0; j < vert; j++ ) {
-        const shift = new Vector2( SCALE_FACTOR * i * model.lattice.latticeConstantsProperty.get().x,
-          -SCALE_FACTOR * j * model.lattice.latticeConstantsProperty.get().z );
-        const distance = SCALE_FACTOR * ( i * model.lattice.latticeConstantsProperty.get().x * Math.sin( theta )
-                                          + j * model.lattice.latticeConstantsProperty.get().z * Math.cos( theta ) );
-        const incidentRayStart = new Vector2( incidentRay1Start.x - distance * Math.sin( theta ),
-          incidentRay1Start.y + distance * Math.cos( theta ) );
-        const incidentRayEnd = incidentRay1End.minus( shift );
-        const incidentRayLength = incidentRayEnd.minus( incidentRayStart ).getMagnitude();
-        const exitRayPhase = ( incidentRayLength / lamda ) * 2 * Math.PI + model.startPhase;
-        const extraLength = 2 * SCALE_FACTOR * Math.cos( theta ) * i * model.lattice.latticeConstantsProperty.get().x;
-        const exitRayEnd = new Vector2( 2 * incidentRayEnd.x - incidentRayStart.x + extraLength * Math.cos( theta ),
-          incidentRayStart.y - extraLength * Math.sin( theta ) );
-        this.lightPathsNode.addChild( new LightPathNode( incidentRayStart, incidentRayEnd, SCALE_FACTOR * model.sourceWavelengthProperty.get(), {
-          amplitude: AMP,
-          startPhase: model.startPhase,
-          waveFrontWidth: raySeparation * model.showWaveFrontsProperty.value
-        } ) );
-        this.lightPathsNode.addChild( new LightPathNode( incidentRayEnd, exitRayEnd, SCALE_FACTOR * model.sourceWavelengthProperty.get(), {
-          amplitude: AMP,
-          startPhase: exitRayPhase,
-          waveFrontWidth: raySeparation * model.showWaveFrontsProperty.value
-        } ) );
-      }
+      this.lightPathsNode.addChild( pLDDimensionArrow );
     }
     this.addChild( this.lightPathsNode );
   }

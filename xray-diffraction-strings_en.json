@@ -3,10 +3,13 @@
     "value": "X-Ray Diffraction"
   },
   "incidentAngle": {
-    "value": "Incident Angle"
+    "value": "Incident Angle: {{value}}{{unit}}"
+  },
+  "angleUnit": {
+    "value": "°"
   },
   "wavelength": {
-    "value": "Wavelength"
+    "value": "Wavelength: {{value}}{{unit}}"
   },
   "horizontalRays": {
     "value": "Horizontal Rays"
@@ -20,31 +23,31 @@
   "bLatticeConstant": {
     "value": "b"
   },
+  "aLatticeEquals": {
+    "value": "a = {{value}}{{unit}}"
+  },
+  "bLatticeEquals": {
+    "value": "b = {{value}}{{unit}}"
+  },
+  "bdLatticeEquals": {
+    "value": "b = d = {{value}}{{unit}}"
+  },
   "interplaneDistance": {
     "value": "d"
-  },
-  "animate": {
-    "value": "Animate"
   },
   "pathDifference": {
     "value": "Path Difference"
   },
-  "showWavefronts": {
-    "value": "Show Wavefronts"
+  "showTransmitted": {
+    "value": "Transmitted Beam"
   },
-  "showParameters": {
-    "value": "Show Parameters"
+  "waveFrontMarkers": {
+    "value": "Wavefront Markers:"
   },
   "inPhase": {
-    "value": "In Phase!"
+    "value": "In Phase! Path Difference = {{wavelengths}}λ"
   },
-  "pathDifferenceEquals": {
-    "value": "Path Difference = "
-  },
-  "wavelengthUnit": {
+  "lengthUnit": {
     "value": "Å"
-  },
-  "angleUnit": {
-    "value": "°"
   }
 }

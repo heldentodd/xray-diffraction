@@ -33,14 +33,17 @@ class LightPathNode extends Node {
       amplitude: 10,  // amplitude of the wave. Might be better to have default amplitude: (endPoint - startPoint)/10
       startPhase: 0, // initial phase of the wave (0 for cosine wave)
       waveFrontWidth: 0, // 0 for no wavefronts
+      // if waveFrontWidth !=0, this gives a pattern of wavefront colors/shades. 60*i gives 6 different colors
+      waveFrontPattern: i => 'hsl(' + ( ( 60 * i % 360 ) + 360 ) % 360 + ', 100%, 50%)',
       stroke: 'black', // color of sine wave
       centerStroke: 'gray', // color of dashed baseline
-      lineWidth: 2  // width of sine wave, double width of center line
+      lineWidth: 2,  // width of sine wave, double width of center line
+      waveFrontLineWidth: 3 // width of the wavefront markers
     }, options );
 
     const length = endPoint.distance( startPoint );
-    const segments = Utils.roundSymmetric( length / wavelength * 16 ); // resolution - number of points 16 points/wavelength
-    const theta = endPoint.minus( startPoint ).getAngle();
+    const segments = Utils.roundSymmetric( length / wavelength * 16 ); // total number of points = number of points 16 points/wavelength
+    const theta = endPoint.minus( startPoint ).getAngle(); // direction of the light path
     const wnK = 2 * Math.PI / wavelength;
 
     //----------------------------------------------------------------------------------------
@@ -50,9 +53,13 @@ class LightPathNode extends Node {
     const waveShape = new Shape();
     const cosTheta = Math.cos( theta );
     const sinTheta = Math.sin( theta );
+
+    // dashed line to define the path of the light
     rayShape.moveToPoint( startPoint );
     rayShape.lineToPoint( endPoint );
     rayShape = rayShape.getDashedShape( [ 8 ], 0 );
+
+    // create the sine wave
     let pointFromStart = new Vector2( options.amplitude * Math.cos( options.startPhase ) * sinTheta,
       -options.amplitude * Math.cos( options.startPhase ) * cosTheta );
     waveShape.moveToPoint( startPoint.plus( pointFromStart ) );
@@ -62,6 +69,7 @@ class LightPathNode extends Node {
         currentL * sinTheta - options.amplitude * Math.cos( wnK * currentL + options.startPhase ) * cosTheta );
       waveShape.lineToPoint( startPoint.plus( pointFromStart ) );
     }
+
     const rayPath = new Path( rayShape, {
       stroke: options.centerStroke,
       lineWidth: options.lineWidth / 2
@@ -75,18 +83,19 @@ class LightPathNode extends Node {
     this.addChild( rayPath );
     this.addChild( wavePath );
 
-    // logic to show wavefronts
+    // optionally show wavefronts
     if ( options.waveFrontWidth ) {
+      // start phase as a fraction of the wavelength. Used to offset from every wavefront to the peak of the wave.
       const firstWaveFront = options.startPhase / 2 / Math.PI;
-      const firstWaveFrontLength = firstWaveFront * wavelength;
       const waveFrontAmp = new Vector2( options.waveFrontWidth / 2 * sinTheta, -options.waveFrontWidth / 2 * cosTheta );
       for ( let i = Math.ceil( firstWaveFront ); i < firstWaveFront + length / wavelength; i++ ) {
-        const waveFrontPosition = new Vector2( ( firstWaveFrontLength - i * wavelength ) * cosTheta,
-          ( firstWaveFrontLength - i * wavelength ) * sinTheta );
+        // position to the i^th wavefront
+        const waveFrontPosition = new Vector2( ( firstWaveFront - i ) * wavelength * cosTheta,
+          ( firstWaveFront - i ) * wavelength * sinTheta );
         this.addChild( new Path( Shape.lineSegment( startPoint.minus( waveFrontPosition ).plus( waveFrontAmp ),
           startPoint.minus( waveFrontPosition ).minus( waveFrontAmp ) ), {
-          stroke: 'hsl(' + ( ( 60 * i % 360 ) + 360 ) % 360 + ', 100%, 50%)', // gives 60*i gives 6 different colors
-          lineWidth: 3
+          stroke: options.waveFrontPattern( i ),
+          lineWidth: options.waveFrontLineWidth
         } ) );
       }
     }

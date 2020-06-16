@@ -2,20 +2,8 @@
   "xray-diffraction.title": {
     "value": "X-Ray Diffraction"
   },
-  "incidentAngle": {
-    "value": "Incident Angle: {{value}}{{unit}}"
-  },
   "angleUnit": {
     "value": "°"
-  },
-  "wavelength": {
-    "value": "Wavelength: {{value}}{{unit}}"
-  },
-  "horizontalRays": {
-    "value": "Horizontal Rays"
-  },
-  "verticalRays": {
-    "value": "Vertical Rays"
   },
   "aLatticeConstant": {
     "value": "a"
@@ -29,31 +17,46 @@
   "bdLatticeEquals": {
     "value": "b = d = {{value}}{{unit}}"
   },
-  "interplaneDistance": {
-    "value": "d"
-  },
-  "pathDifference": {
-    "value": "Path Difference"
-  },
-  "showTransmitted": {
-    "value": "Transmitted Beam"
-  },
-  "waveFrontMarkers": {
-    "value": "Wavefront Markers:"
-  },
-  "inPhase": {
-    "value": "In Phase! Path Difference = {{wavelengths}}λ"
+  "braggEquation": {
+    "value": "2{{interplaneDistance}} sin(θ)/λ = {{value}}"
   },
   "dSinTheta": {
     "value": "d<i>sin</i>(θ)"
   },
-  "pLD": {
-    "value": "2{{interplaneDistance}} sin(θ) = {{value}}{{unit}}"
+  "horizontalRays": {
+    "value": "Horizontal Rays"
   },
-  "braggEquation": {
-    "value": "2{{interplaneDistance}} sin(θ)/λ = {{value}}"
+  "incidentAngle": {
+    "value": "Incident Angle: {{value}}{{unit}}"
+  },
+  "inPhase": {
+    "value": "In Phase! Path Difference = {{wavelengths}}λ"
+  },
+  "interplaneDistance": {
+    "value": "d"
   },
   "lengthUnit": {
     "value": "Å"
+  },
+  "moreParameters": {
+    "value": "More Parameters"
+  },
+  "pathDifference": {
+    "value": "Path Difference"
+  },
+  "pLD": {
+    "value": "2{{interplaneDistance}} sin(θ) = {{value}}{{unit}}"
+  },
+  "showTransmitted": {
+    "value": "Transmitted Beam"
+  },
+  "verticalRays": {
+    "value": "Vertical Rays"
+  },
+  "wavelength": {
+    "value": "Wavelength: {{value}}{{unit}}"
+  },
+  "waveFrontMarkers": {
+    "value": "Wavefront Markers:"
   }
 }

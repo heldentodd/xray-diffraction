@@ -31,19 +31,21 @@ import xrayDiffraction from '../../xrayDiffraction.js';
 import xrayDiffractionStrings from '../../xrayDiffractionStrings.js';
 
 // strings
+const angleUnitString = xrayDiffractionStrings.angleUnit;
 const aLatticeEqualsString = xrayDiffractionStrings.aLatticeEquals;
 const bdLatticeEqualsString = xrayDiffractionStrings.bdLatticeEquals;
+const braggEquationString = xrayDiffractionStrings.braggEquation;
+const horizontalRaysString = xrayDiffractionStrings.horizontalRays;
 const incidentAngleString = xrayDiffractionStrings.incidentAngle;
 const interplaneDistanceString = xrayDiffractionStrings.interplaneDistance;
-const horizontalRaysString = xrayDiffractionStrings.horizontalRays;
 const lengthUnitString = xrayDiffractionStrings.lengthUnit;
+const moreParametersString = xrayDiffractionStrings.moreParameters;
 const pathDifferenceString = xrayDiffractionStrings.pathDifference;
 const pLDString = xrayDiffractionStrings.pLD;
-const braggEquationString = xrayDiffractionStrings.braggEquation;
-const wavefrontsMarkersString = xrayDiffractionStrings.waveFrontMarkers;
-const verticalRaysString = xrayDiffractionStrings.verticalRays;
-const wavelengthString = xrayDiffractionStrings.wavelength;
 const showTransmittedString = xrayDiffractionStrings.showTransmitted;
+const verticalRaysString = xrayDiffractionStrings.verticalRays;
+const wavefrontsMarkersString = xrayDiffractionStrings.waveFrontMarkers;
+const wavelengthString = xrayDiffractionStrings.wavelength;
 
 const TEXT_OPTIONS = { font: new PhetFont( { family: 'Verdana', size: 14 } ), maxWidth: 200, align: 'center', setBoundsMethod: 'accurate' };
 const SLIDER_OPTIONS = { trackSize: new Dimension2( 90, 1 ), thumbSize: new Dimension2( 13, 22 ) };
@@ -79,7 +81,7 @@ class XrayControlPanel extends VBox {
     model.sourceAngleProperty.link( angle => {
       angleTitle.text = StringUtils.fillIn( incidentAngleString, {
         value: Utils.toFixed( angle * 180 / Math.PI, 1 ),
-        unit: xrayDiffractionStrings.angleUnit
+        unit: angleUnitString
       } );
     } );
 
@@ -94,7 +96,7 @@ class XrayControlPanel extends VBox {
     model.sourceWavelengthProperty.link( wavelength => {
       wavelengthTitle.text = StringUtils.fillIn( wavelengthString, {
         value: wavelength,
-        unit: xrayDiffractionStrings.lengthUnit
+        unit: lengthUnitString
       } );
     } );
 
@@ -226,7 +228,7 @@ class XrayControlPanel extends VBox {
     } );
 
     const accordianOptional = new AccordionBox( optionalParameters, merge( {
-      titleNode: new Text( 'More Parameters', TEXT_OPTIONS ),
+      titleNode: new Text( moreParametersString, TEXT_OPTIONS ),
       minWidth: mainContent.width,
       expandedProperty: model.moreParmsExpandedProperty,
       showTitleWhenExpanded: true

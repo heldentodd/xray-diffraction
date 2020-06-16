@@ -2,20 +2,8 @@
   "xray-diffraction.title": {
     "value": "Röntgenbeugung"
   },
-  "incidentAngle": {
-    "value": "Einfallswinkel: {{value}}{{units}}"
-  },
   "angleUnit": {
     "value": "°"
-  },
-  "wavelength": {
-    "value": "Wellenlänge: {{value}}{{lengthUnit}}"
-  },
-  "horizontalRays": {
-    "value": "Horizontale Strahlen"
-  },
-  "verticalRays": {
-    "value": "Vertikale Strahlen"
   },
   "aLatticeConstant": {
     "value": "a"
@@ -29,31 +17,46 @@
   "bdLatticeEquals": {
     "value": "b = d = {{value}}{{unit}}"
   },
-  "interplaneDistance": {
-    "value": "d"
-  },
-  "pathDifference": {
-    "value": "Pfadunterschied"
-  },
-  "showTransmitted": {
-    "value": "Sendestrahl"
-  },
-  "waveFrontMarkers": {
-    "value": "Wellenfrontindikatoren:"
-  },
-  "inPhase": {
-    "value": "In Phase! Pfadunterschied = {{wavelengths}}λ"
+  "braggEquation": {
+    "value": "2{{interplaneDistance}} sin(θ)/λ = {{value}}"
   },
   "dSinTheta": {
     "value": "d<i>sin</i>(θ)"
   },
+  "horizontalRays": {
+    "value": "Horizontale Strahlen"
+  },
+  "incidentAngle": {
+    "value": "Einfallswinkel: {{value}}{{unit}}"
+  },
+  "inPhase": {
+    "value": "In Phase! Pfadunterschied = {{wavelengths}}λ"
+  },
+  "interplaneDistance": {
+    "value": "d"
+  },
+  "lengthUnit": {
+    "value": "Å"
+  },
+  "moreParameters": {
+    "value": "Weitere Parameter"
+  },
+  "pathDifference": {
+    "value": "Pfadunterschied"
+  },
   "pLD": {
     "value": "2{{interplaneDistance}} sin(θ) = {{value}}{{unit}}"
   },
-  "braggEquation": {
-    "value": "2{{interplaneDistance}} sin(θ)/λ = {{value}}"
+  "showTransmitted": {
+    "value": "Sendestrahl"
   },
-  "wavelengthUnit": {
-    "value": "Å"
+  "verticalRays": {
+    "value": "Vertikale Strahlen"
+  },
+  "waveFrontMarkers": {
+    "value": "Wellenfrontindikatoren:"
+  },
+  "wavelength": {
+    "value": "Wellenlänge: {{value}}{{unit}}"
   }
 }

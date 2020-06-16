@@ -34,7 +34,7 @@ import ProtractorNode from './ProtractorNode.js';
 import XrayControlPanel from './XrayControlPanel.js';
 
 // strings
-const interplaneDistanceString = xrayDiffractionStrings.interplaneDistance;
+const dSinThetaString = xrayDiffractionStrings.dSinTheta;
 const inPhaseString = xrayDiffractionStrings.inPhase;
 
 const DIMENSION_ARROW_OPTIONS = { fill: 'black', stroke: null, tailWidth: 2, headWidth: 7, headHeight: 20, doubleHead: true };
@@ -43,6 +43,7 @@ const SCALE_FACTOR = XrayDiffractionConstants.SCALE_FACTOR;
 const TOP_RAY_LENGTH = 400; // Arbitrary length of top incident ray to start it near the top left
 // Arbitrary location of the crystal near the bottom center
 const CRYSTAL_NODE_OPTIONS = { centerX: 400, centerY: 440 };
+const ELEMENT_SPACING = XrayDiffractionConstants.ELEMENT_SPACING;
 
 class XrayDiffractionScreenView extends ScreenView {
 
@@ -126,7 +127,6 @@ class XrayDiffractionScreenView extends ScreenView {
     // add tape measure
     const measuringTapeProperty = new Property( { name: 'Å', multiplier: 1 / SCALE_FACTOR } );
     const measuringTapeNode = new MeasuringTapeNode( measuringTapeProperty, new BooleanProperty( true ), {
-
       // translucent white background, same value as in Projectile Motion, see https://github.com/phetsims/projectile-motion/issues/156
       textBackgroundColor: 'rgba(255,255,255,0.6)',
       textColor: 'black',
@@ -255,7 +255,7 @@ class XrayDiffractionScreenView extends ScreenView {
     this.timeControlNode.top = XrayDiffractionConstants.SCREEN_VIEW_Y_MARGIN;
     this.controlPanel.right = this.layoutBounds.maxX - XrayDiffractionConstants.SCREEN_VIEW_X_MARGIN;
     this.timeControlNode.left = this.controlPanel.left;
-    this.controlPanel.top = this.timeControlNode.bottom + 5;
+    this.controlPanel.top = this.timeControlNode.bottom + ELEMENT_SPACING;
     this.addChild( this.controlPanel );
 
     // update view on model step
@@ -301,6 +301,7 @@ class XrayDiffractionScreenView extends ScreenView {
   /**
    * Draws the light rays (incoming and outgoing) along with the path length difference (PLD) region if checked.
    * For all updates after the initial drawing. If this ends up costing to much time, could be inlined and eliminated.
+   * Repeated calls to Math.sin() could also be eliminated by defining a variable.
    * @param {XrayDiffractionModel} model
    * @param {CrystalNode} crystalNode
    * @public
@@ -420,14 +421,14 @@ class XrayDiffractionScreenView extends ScreenView {
       this.lightPathsNode.addChild( pLDRegionPath2 );
 
       // add d sin(θ) and dimension arrow
-      const pLDArrowStart = lineStart.plusXY( ( 5 + AMP + raySeparation ) * Math.sin( theta ), ( 5 + AMP + raySeparation ) * Math.cos( theta ) );
+      const pLDArrowStart = lineStart.plusXY( ( ELEMENT_SPACING + AMP + raySeparation ) * Math.sin( theta ),
+        ( ELEMENT_SPACING + AMP + raySeparation ) * Math.cos( theta ) );
       const pLDArrowEnd = pLDArrowStart.plusXY( -dSinTheta * Math.cos( theta ), dSinTheta * Math.sin( theta ) );
-      const pLDLabelCenter = pLDArrowStart.plusXY( 5 * Math.sin( theta ) - ( dSinTheta * Math.cos( theta ) ) / 2,
-        5 * Math.cos( theta ) + ( dSinTheta * Math.sin( theta ) ) / 2 );
+      const pLDLabelCenter = pLDArrowStart.plusXY( ELEMENT_SPACING * Math.sin( theta ) - ( dSinTheta * Math.cos( theta ) ) / 2,
+        ELEMENT_SPACING * Math.cos( theta ) + ( dSinTheta * Math.sin( theta ) ) / 2 );
       const pLDDimensionArrow = new ArrowNode( pLDArrowStart.x, pLDArrowStart.y, pLDArrowEnd.x, pLDArrowEnd.y, DIMENSION_ARROW_OPTIONS );
 
-      const pLDDimensionLabel = new RichText( interplaneDistanceString + '<i>sin</i>(θ)',
-        { maxWidth: 200, left: pLDLabelCenter.x, centerY: pLDLabelCenter.y } );
+      const pLDDimensionLabel = new RichText( dSinThetaString, { maxWidth: 200, left: pLDLabelCenter.x, centerY: pLDLabelCenter.y } );
       // add a translucent white background behind the label text - could also use BackgroundNode
       const pLDLabelBackground = new Rectangle( pLDDimensionLabel.x, pLDDimensionLabel.top,
         pLDDimensionLabel.width + 2, pLDDimensionLabel.height + 2, 4, 4, {

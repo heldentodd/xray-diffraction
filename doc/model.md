@@ -56,13 +56,17 @@ cystal lattice sites array as it is the point where the first light ray hits.
 
 The first light ray enters at the proper angle and reflects specularly off the top center atom 
 (transmitted rays, etc. are not currently shown). Rays bouncing off lower atoms travel a longer distance 
-and thus can end up in-phase or out of phase depending on the lattice constant and incident angle.
+and thus can end up in-phase or out of phase depending on the lattice constant and incident angle. The 
+transmitted ray can also be shown.
 
 ## Detection of Bragg Condition
 
 When the additional path length differene (PLD) the lower ray travels is exactly an integer multiple of the 
 light wavelength, the Bragg condition is met. When this is detected, the simulation is notified so that 
-this can be displayed to the user.
+this can be displayed to the user. When the condition is met, the diffracted rays are made bold to indicate
+that the condition for constructive interference is met and a diffraction peak will be seen at that angle.
+If present, the transmitted ray is also made slightly less bold to indicate that some intensity is diffracted
+away. 
 
 ## Vertical and Horizontal Rays
 

@@ -20,12 +20,13 @@ import Path from '../../../../scenery/js/nodes/Path.js';
 import PhetFont from '../../../../scenery-phet/js/PhetFont.js';
 import Property from '../../../../axon/js/Property.js';
 import RadioButtonGroup from '../../../../sun/js/buttons/RadioButtonGroup.js';
-import RangeWithValue from '../../../../dot/js/RangeWithValue.js';
+import Range from '../../../../dot/js/Range.js';
 import Shape from '../../../../kite/js/Shape.js';
 import StringUtils from '../../../../phetcommon/js/util/StringUtils.js';
 import Text from '../../../../scenery/js/nodes/Text.js';
 import Utils from '../../../../dot/js/Utils.js';
 import VBox from '../../../../scenery/js/nodes/VBox.js';
+import XrayDiffractionConstants from '../../common/XrayDiffractionConstants.js';
 import xrayDiffraction from '../../xrayDiffraction.js';
 import xrayDiffractionStrings from '../../xrayDiffractionStrings.js';
 
@@ -46,6 +47,7 @@ const showTransmittedString = xrayDiffractionStrings.showTransmitted;
 
 const TEXT_OPTIONS = { font: new PhetFont( { family: 'Verdana', size: 14 } ), maxWidth: 200, align: 'center', setBoundsMethod: 'accurate' };
 const SLIDER_OPTIONS = { trackSize: new Dimension2( 90, 1 ), thumbSize: new Dimension2( 13, 22 ) };
+const ELEMENT_SPACING = XrayDiffractionConstants.ELEMENT_SPACING;
 
 class XrayControlPanel extends VBox {
 
@@ -68,7 +70,7 @@ class XrayControlPanel extends VBox {
     // we can convert from radians to degrees and accomodate right-to-left languages.
     const angleTitle = new Text( '?', TEXT_OPTIONS );
     // Links the current angle and converts it to degrees
-    const angleControl = new NumberControl( angleTitle.text, model.sourceAngleProperty, new RangeWithValue( 0, Math.PI / 2, Math.PI / 3 ),
+    const angleControl = new NumberControl( angleTitle.text, model.sourceAngleProperty, new Range( 0, Math.PI / 2 ),
       {
         delta: Math.PI / 900, // 0.2 degree resolution
         sliderOptions: SLIDER_OPTIONS,
@@ -83,7 +85,7 @@ class XrayControlPanel extends VBox {
 
     // Control for the wavelength
     const wavelengthTitle = new Text( '?', TEXT_OPTIONS );
-    const wavelengthControl = new NumberControl( '?', model.sourceWavelengthProperty, new RangeWithValue( 1, 20, 5 ),
+    const wavelengthControl = new NumberControl( '?', model.sourceWavelengthProperty, new Range( 1, 20 ),
       {
         delta: 0.1, // 0.1 Angstrom resolution
         sliderOptions: SLIDER_OPTIONS,
@@ -98,7 +100,7 @@ class XrayControlPanel extends VBox {
 
     // Control for the b lattice constant (= interplane distance for this orientation)
     const bLatticeTitle = new Text( '?', TEXT_OPTIONS );
-    const bLatticeControl = new NumberControl( '?', model.lattice.cConstantProperty, new RangeWithValue( 2, 20, 7.8 ),
+    const bLatticeControl = new NumberControl( '?', model.lattice.cConstantProperty, new Range( 2, 20 ),
       {
         delta: 0.1, // 0.1 Angstrom resolution
         sliderOptions: SLIDER_OPTIONS,
@@ -119,7 +121,7 @@ class XrayControlPanel extends VBox {
         unit: xrayDiffractionStrings.lengthUnit
       } );
     } );
-    const aLatticeControl = new NumberControl( aLatticeTitle.text, model.lattice.aConstantProperty, new RangeWithValue( 2, 20, 3.8 ),
+    const aLatticeControl = new NumberControl( aLatticeTitle.text, model.lattice.aConstantProperty, new Range( 2, 20 ),
       {
         delta: 0.1, // 0.1 Angstrom resolution
         sliderOptions: SLIDER_OPTIONS,
@@ -133,7 +135,7 @@ class XrayControlPanel extends VBox {
     } );
 
     // Control for number of vertical rays
-    const verticalControl = new NumberControl( '?', model.verticalRaysProperty, new RangeWithValue( 1, 5, 2 ),
+    const verticalControl = new NumberControl( '?', model.verticalRaysProperty, new Range( 1, 5 ),
       {
         delta: 1, // interger number of rays
         sliderOptions: SLIDER_OPTIONS,
@@ -141,7 +143,7 @@ class XrayControlPanel extends VBox {
       } );
 
     // Control for number of horizontal rays
-    const horizontalControl = new NumberControl( '?', model.horizontalRaysProperty, new RangeWithValue( 0, 2, 0 ),
+    const horizontalControl = new NumberControl( '?', model.horizontalRaysProperty, new Range( 0, 2 ),
       {
         delta: 1, // interger number of rays
         sliderOptions: SLIDER_OPTIONS,
@@ -207,12 +209,12 @@ class XrayControlPanel extends VBox {
     const checkboxes = new VBox( {
       align: 'left',
       children: [ separator, pathDifferenceCheckbox, showTransmittedCheckbox, separator2 ],
-      spacing: 5
+      spacing: ELEMENT_SPACING
     } );
     const content = new VBox( {
       align: 'center',
       children: [ angleControl, wavelengthControl, bLatticeControl, checkboxes, waveFrontMarkersTitle, wavefrontRadioGroup ],
-      spacing: 5
+      spacing: ELEMENT_SPACING
     } );
     const mainContent = new Panel( content, options );
 
@@ -220,7 +222,7 @@ class XrayControlPanel extends VBox {
     const optionalParameters = new VBox( {
       align: 'center',
       children: [ aLatticeControl, verticalControl, horizontalControl ],
-      spacing: 5
+      spacing: ELEMENT_SPACING
     } );
 
     const accordianOptional = new AccordionBox( optionalParameters, merge( {
@@ -270,7 +272,7 @@ class XrayControlPanel extends VBox {
 
     super( {
       children: [ mainContent, accordianOptional ],
-      spacing: 5
+      spacing: ELEMENT_SPACING
     } );
   }
 }
@@ -310,7 +312,7 @@ function createControlLayoutFunction( titleTextNode, options ) {
  * @returns {Node}
  * @public
  * @static
- */// function to create lines symbols for wavefront markers radioButton
+ */
 function createLines( interationFunction ) {
   const height = 20; // arbitrary size of icon. set by hand
   const spacing = height / 4; // square icon for 4 wavefronts. set by hand

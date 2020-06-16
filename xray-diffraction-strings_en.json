@@ -26,9 +26,6 @@
   "aLatticeEquals": {
     "value": "a = {{value}}{{unit}}"
   },
-  "bLatticeEquals": {
-    "value": "b = {{value}}{{unit}}"
-  },
   "bdLatticeEquals": {
     "value": "b = d = {{value}}{{unit}}"
   },
@@ -46,6 +43,9 @@
   },
   "inPhase": {
     "value": "In Phase! Path Difference = {{wavelengths}}λ"
+  },
+  "dSinTheta": {
+    "value": "d<i>sin</i>(θ)"
   },
   "pLD": {
     "value": "2{{interplaneDistance}} sin(θ) = {{value}}{{unit}}"

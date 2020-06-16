@@ -39,7 +39,7 @@ class XrayDiffractionModel {
     this.animateProperty = new BooleanProperty( false );  // Play/pause the animation
     this.pathDifferenceProperty = new BooleanProperty( false );  // Let the student turn it on so that they can think about it
     this.showTransmittedProperty = new BooleanProperty( false );  // Whether to show the transmitted beam
-    this.wavefrontProperty = new Property( 'none' );  // whether to show wavefronts on the light waves
+    this.wavefrontProperty = new Property( 'none' );  // set to 'none' for no wavefronts or to a color/shade iteration function.
     this.moreParmsExpandedProperty = new BooleanProperty( false );  // for minor parameters on the control panel
 
     // @private - These are automatically calculated from other properties

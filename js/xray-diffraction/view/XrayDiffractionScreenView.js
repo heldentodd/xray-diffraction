@@ -6,31 +6,31 @@
 
 import BooleanProperty from '../../../../axon/js/BooleanProperty.js';
 import Property from '../../../../axon/js/Property.js';
+import Utils from '../../../../dot/js/Utils.js';
 import Vector2 from '../../../../dot/js/Vector2.js';
 import Vector2Property from '../../../../dot/js/Vector2Property.js';
 import ScreenView from '../../../../joist/js/ScreenView.js';
 import Shape from '../../../../kite/js/Shape.js';
+import StringUtils from '../../../../phetcommon/js/util/StringUtils.js';
 import ArrowNode from '../../../../scenery-phet/js/ArrowNode.js';
 import ResetAllButton from '../../../../scenery-phet/js/buttons/ResetAllButton.js';
 import MeasuringTapeNode from '../../../../scenery-phet/js/MeasuringTapeNode.js';
+import ProtractorNode from '../../../../scenery-phet/js/ProtractorNode.js';
+import TimeControlNode from '../../../../scenery-phet/js/TimeControlNode.js';
 import DragListener from '../../../../scenery/js/listeners/DragListener.js';
 import Node from '../../../../scenery/js/nodes/Node.js';
 import Path from '../../../../scenery/js/nodes/Path.js';
+import Rectangle from '../../../../scenery/js/nodes/Rectangle.js';
 import RichText from '../../../../scenery/js/nodes/RichText.js';
 import VBox from '../../../../scenery/js/nodes/VBox.js';
 import Panel from '../../../../sun/js/Panel.js';
-import Rectangle from '../../../../scenery/js/nodes/Rectangle.js';
-import StringUtils from '../../../../phetcommon/js/util/StringUtils.js';
 import Tandem from '../../../../tandem/js/Tandem.js';
-import TimeControlNode from '../../../../scenery-phet/js/TimeControlNode.js';
-import Utils from '../../../../dot/js/Utils.js';
 import XrayDiffractionConstants from '../../common/XrayDiffractionConstants.js';
 import xrayDiffraction from '../../xrayDiffraction.js';
 import xrayDiffractionStrings from '../../xrayDiffractionStrings.js';
 import XrayDiffractionModel from '../model/XrayDiffractionModel.js';
 import CrystalNode from './CrystalNode.js';
 import LightPathNode from './LightPathNode.js';
-import ProtractorNode from './ProtractorNode.js';
 import XrayControlPanel from './XrayControlPanel.js';
 
 // strings
@@ -87,13 +87,16 @@ class XrayDiffractionScreenView extends ScreenView {
 
     // create the protractor node
     const showProtractorProperty = new BooleanProperty( false );
-    const protractorNode = new ProtractorNode( showProtractorProperty, true, { scale: 0.8 } );
+    const protractorNode = new ProtractorNode( showProtractorProperty, {
+      rotatable: true,
+      scale: 0.8
+    } );
     protractorNode.protractorAngleProperty.value = Math.PI / 2;
     const protractorPositionProperty = new Vector2Property( protractorNode.center );
     // This link exists for the entire duration of the sim. No need to dispose.
     showProtractorProperty.linkAttribute( protractorNode, 'visible' );
 
-    const protractorNodeIcon = new ProtractorNode( showProtractorProperty, false, { scale: 0.24 } );
+    const protractorNodeIcon = ProtractorNode.createIcon( { scale: 0.24 } );
     // This link exists for the entire duration of the sim. No need to dispose.
     showProtractorProperty.link( showProtractor => { protractorNodeIcon.visible = !showProtractor; } );
 

@@ -34,6 +34,7 @@ class LightPathNode extends Node {
       startPhase: 0, // initial phase of the wave (0 for cosine wave)
       waveFrontWidth: 0, // 0 for no wavefronts
       // if waveFrontWidth !=0, this gives a pattern of wavefront colors/shades. 60*i gives 6 different colors
+      // can also use () => 'black' for black wavefronts, etc.
       waveFrontPattern: i => 'hsl(' + ( ( 60 * i % 360 ) + 360 ) % 360 + ', 100%, 50%)',
       stroke: 'black', // color of sine wave
       centerStroke: 'gray', // color of dashed baseline
@@ -45,6 +46,8 @@ class LightPathNode extends Node {
     const segments = Utils.roundSymmetric( length / wavelength * 16 ); // total number of points = number of points 16 points/wavelength
     const theta = endPoint.minus( startPoint ).getAngle(); // direction of the light path
     const wnK = 2 * Math.PI / wavelength;
+
+    if ( segments < 2 ) {return new Node();} // must have at least 2 points to draw anything. Otherwise just return empty node.
 
     //----------------------------------------------------------------------------------------
 

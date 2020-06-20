@@ -24,6 +24,7 @@ import Rectangle from '../../../../scenery/js/nodes/Rectangle.js';
 import RichText from '../../../../scenery/js/nodes/RichText.js';
 import VBox from '../../../../scenery/js/nodes/VBox.js';
 import Panel from '../../../../sun/js/Panel.js';
+import PhetFont from '../../../../scenery-phet/js/PhetFont.js';
 import Tandem from '../../../../tandem/js/Tandem.js';
 import XrayDiffractionConstants from '../../common/XrayDiffractionConstants.js';
 import xrayDiffraction from '../../xrayDiffraction.js';
@@ -39,8 +40,14 @@ const inPhaseString = xrayDiffractionStrings.inPhase;
 
 const DIMENSION_ARROW_OPTIONS = { fill: 'black', stroke: null, tailWidth: 2, headWidth: 7, headHeight: 20, doubleHead: true };
 const AMP = 10;
+const braggEquationString = xrayDiffractionStrings.braggEquation;
+const interplaneDistanceString = xrayDiffractionStrings.interplaneDistance;
+const lengthUnitString = xrayDiffractionStrings.lengthUnit;
+const pLDString = xrayDiffractionStrings.pLD;
 const SCALE_FACTOR = XrayDiffractionConstants.SCALE_FACTOR;
+const TEXT_OPTIONS = { font: new PhetFont( { family: 'Verdana', size: 14 } ), maxWidth: 200, align: 'center', setBoundsMethod: 'accurate' };
 const TOP_RAY_LENGTH = 400; // Arbitrary length of top incident ray to start it near the top left
+
 // Arbitrary location of the crystal near the bottom center
 const CRYSTAL_NODE_OPTIONS = { centerX: 400, centerY: 440 };
 const ELEMENT_SPACING = XrayDiffractionConstants.ELEMENT_SPACING;
@@ -59,10 +66,20 @@ class XrayDiffractionScreenView extends ScreenView {
       tandem: tandem
     } );
 
-    // @private - used to display the array of atoms
+    // @private - used to display the array of atoms. Using container to keep the correct order when we removeChild
     this.crystalNode = new CrystalNode( model.lattice.sites, model.lattice.latticeConstantsProperty.value, CRYSTAL_NODE_OPTIONS );
+    this.crystalNodeContainer = new Node();
+    this.crystalNodeContainer.addChild( this.crystalNode );
+    this.addChild( this.crystalNodeContainer );
 
-    this.addChild( this.crystalNode );
+    // @private - used to draw the current frame of the light waves. Updated at each timestep when animating.
+    this.lightPathsNode = new Node();
+    this.addChild( this.lightPathsNode );
+
+    // @private node for displaying PLD region
+    this.pLDNode = new Node();
+    this.pLDChanged = true;
+    this.addChild( this.pLDNode );
 
     // Initial drawing of light onto the screen.
     this.drawLight( model, this.crystalNode );
@@ -76,14 +93,13 @@ class XrayDiffractionScreenView extends ScreenView {
           listener: () => {
             // .04 s - about 2 timesteps seems about right
             model.manualStep( .04 );
-            this.redrawLight( model, this.crystalNode );
+            this.drawLight( model, this.crystalNode );
           }
         }
       },
       tandem: tandem.createTandem( 'timeControlNode' )
     } );
     // layout positioning done after control panel is created
-    this.addChild( this.timeControlNode );
 
     // create the protractor node
     const showProtractorProperty = new BooleanProperty( false );
@@ -180,15 +196,19 @@ class XrayDiffractionScreenView extends ScreenView {
     this.addChild( protractorNode );
     this.addChild( measuringTapeNode );
 
-    // update when angle changes
-    // listener created once and needed for life of simulation. No need to dispose.
-    model.sourceAngleProperty.changedEmitter.addListener( () => {
-      this.redrawLight( model, this.crystalNode );
-    } );
-
     // max width set to 260 which is less than the exit ray length
     const inPhaseText = new RichText( '', { maxWidth: 260 } );
     this.addChild( inPhaseText );
+
+    // Note when we need to redraw PLD region
+    // listener created once and needed for life of simulation. No need to dispose.
+    model.pLDWavelengthsProperty.changedEmitter.addListener( () => {this.pLDChanged = true;} );
+
+    // show/hide the PLD node when the checkbox linked to pathDifferenceProperty is checked.
+    // listener created once and needed for life of simulation. No need to dispose.
+    model.pathDifferenceProperty.link( hideTF => {
+      this.pLDNode.visible = hideTF;
+    } );
 
     // displays message when path length difference (PLD) is integral multiple of the wavelength
     // listener created once and needed for life of simulation. No need to dispose.
@@ -223,16 +243,17 @@ class XrayDiffractionScreenView extends ScreenView {
       }
     } );
 
-    // update display when wavelength, ray grid, or path difference checkbox changes
+    // update display when incident angle, wavelength, ray grid, or path difference checkbox changes
     // This link exists for the entire duration of the sim. No need to dispose.
     Property.multilink( [
+      model.sourceAngleProperty,
       model.sourceWavelengthProperty,
       model.horizontalRaysProperty,
       model.verticalRaysProperty,
       model.wavefrontProperty,
       model.pathDifferenceProperty,
       model.showTransmittedProperty
-    ], () => { this.redrawLight( model, this.crystalNode ); } );
+    ], () => { this.drawLight( model, this.crystalNode ); } );
 
     // update crystal when lattice parameters change
     // This link exists for the entire duration of the sim. No need to dispose.
@@ -243,28 +264,24 @@ class XrayDiffractionScreenView extends ScreenView {
       model.lattice.latticeConstantsProperty.value.x = model.lattice.aConstantProperty.value;
       model.lattice.latticeConstantsProperty.value.z = model.lattice.cConstantProperty.value;
       model.lattice.updateSites();
-      this.removeChild( this.crystalNode );
+      this.crystalNodeContainer.removeChild( this.crystalNode );
       this.crystalNode = new CrystalNode( model.lattice.sites, model.lattice.latticeConstantsProperty.value, CRYSTAL_NODE_OPTIONS );
-      this.addChild( this.crystalNode );
-      this.redrawLight( model, this.crystalNode );
-      protractorNode.moveToFront();
-      measuringTapeNode.moveToFront();
+      this.crystalNodeContainer.addChild( this.crystalNode );
+      this.drawLight( model, this.crystalNode );
     } );
 
     // @private - used to create an input panel for users to adjust parameters of the simulation
-    this.controlPanel = new XrayControlPanel( model );
+    this.controlPanel = new XrayControlPanel( model, this.timeControlNode );
 
     // Layout for controls done manually at the top right
-    this.timeControlNode.top = XrayDiffractionConstants.SCREEN_VIEW_Y_MARGIN;
+    this.controlPanel.top = XrayDiffractionConstants.SCREEN_VIEW_Y_MARGIN;
     this.controlPanel.right = this.layoutBounds.maxX - XrayDiffractionConstants.SCREEN_VIEW_X_MARGIN;
-    this.timeControlNode.left = this.controlPanel.left;
-    this.controlPanel.top = this.timeControlNode.bottom + ELEMENT_SPACING;
     this.addChild( this.controlPanel );
 
     // update view on model step
     model.addStepListener( () => {
       if ( model.animateProperty ) {
-        this.redrawLight( model, this.crystalNode );
+        this.drawLight( model, this.crystalNode );
       }
     } );
 
@@ -274,17 +291,15 @@ class XrayDiffractionScreenView extends ScreenView {
         model.reset();
         this.reset();
         measuringTapeNode.reset();
-        this.removeChild( this.crystalNode );
+        this.crystalNodeContainer.removeChild( this.crystalNode );
         this.crystalNode = new CrystalNode( model.lattice.sites, model.lattice.latticeConstantsProperty.value, CRYSTAL_NODE_OPTIONS );
-        this.addChild( this.crystalNode );
-        this.redrawLight( model, this.crystalNode );
+        this.crystalNodeContainer.addChild( this.crystalNode );
+        this.drawLight( model, this.crystalNode );
         showProtractorProperty.reset();
         protractorNode.protractorAngleProperty.value = Math.PI / 2;
-        protractorNode.moveToFront();
         isMeasuringTapeInPlayAreaProperty.value = false;
         measuringTapeNode.visible = false;
         measuringTapeNode.reset();
-        measuringTapeNode.moveToFront();
       },
       right: this.layoutBounds.maxX - XrayDiffractionConstants.SCREEN_VIEW_X_MARGIN,
       bottom: this.layoutBounds.maxY - XrayDiffractionConstants.SCREEN_VIEW_Y_MARGIN,
@@ -303,25 +318,13 @@ class XrayDiffractionScreenView extends ScreenView {
 
   /**
    * Draws the light rays (incoming and outgoing) along with the path length difference (PLD) region if checked.
-   * For all updates after the initial drawing. If this ends up costing to much time, could be inlined and eliminated.
-   * Repeated calls to Math.sin() could also be eliminated by defining a variable.
-   * @param {XrayDiffractionModel} model
-   * @param {CrystalNode} crystalNode
-   * @public
-   */
-  redrawLight( model, crystalNode ) {
-    this.removeChild( this.lightPathsNode );
-    this.drawLight( model, crystalNode );
-  }
-
-  /**
-   * Draws the light rays (incoming and outgoing) along with the path length difference (PLD) region if checked.
-   * Should one be called for the initial drawing. Otherwise use redrawLight.
+   * Repeated calls to Math.sin() could be eliminated by defining a variable.
    * @param {XrayDiffractionModel} model
    * @param {CrystalNode} crystalNode
    * @public
    */
   drawLight( model, crystalNode ) {
+    this.lightPathsNode.removeAllChildren();
     const theta = model.sourceAngleProperty.get();
     const lamda = SCALE_FACTOR * model.sourceWavelengthProperty.get();
     const raySeparation = SCALE_FACTOR * ( model.lattice.latticeConstantsProperty.value.z * Math.cos( theta ) );
@@ -331,9 +334,6 @@ class XrayDiffractionScreenView extends ScreenView {
     // Arbitrary length (400 pixels) of top incident ray to start it near the top left
     let incidentRay1Start = new Vector2( TOP_RAY_LENGTH, 0 );
     incidentRay1Start = incidentRay1End.minus( incidentRay1Start.rotated( model.sourceAngleProperty.get() ) );
-
-    // @private - used to draw the current frame of the light waves. Updated at each timestep when animating.
-    this.lightPathsNode = new Node();
 
     // Main logic to draw the light rays
     const horiz = Math.floor( Math.min( model.horizontalRaysProperty.get(), 20 / model.lattice.latticeConstantsProperty.get().x ) );
@@ -386,8 +386,10 @@ class XrayDiffractionScreenView extends ScreenView {
       }
     }
 
-    // if checked, draw the Path Length Difference region
-    if ( model.pathDifferenceProperty.value ) {
+    // if checked, draw the Path Length Difference region (only if it has changed)
+    if ( model.pathDifferenceProperty.value && this.pLDChanged ) {
+      this.pLDChanged = false;
+      this.pLDNode.removeAllChildren();
       const dSinTheta = SCALE_FACTOR * ( model.lattice.latticeConstantsProperty.value.z * Math.sin( theta ) );
       const lineStart = incidentRay1End;
       const lineInEnd = new Vector2( lineStart.x - ( AMP + raySeparation ) * Math.sin( theta ), lineStart.y + ( AMP + raySeparation ) * Math.cos( theta ) );
@@ -401,7 +403,7 @@ class XrayDiffractionScreenView extends ScreenView {
         stroke: 'blue',
         lineWidth: 1
       } );
-      this.lightPathsNode.addChild( pLDPath );
+      this.pLDNode.addChild( pLDPath );
 
       // Shade in the region of path length difference
       const pLDRegion1 = new Shape();
@@ -420,8 +422,8 @@ class XrayDiffractionScreenView extends ScreenView {
       const pLDRegionPath1 = new Path( pLDRegion1, pLDRegionOptions );
       const pLDRegionPath2 = new Path( pLDRegion2, pLDRegionOptions );
 
-      this.lightPathsNode.addChild( pLDRegionPath1 );
-      this.lightPathsNode.addChild( pLDRegionPath2 );
+      this.pLDNode.addChild( pLDRegionPath1 );
+      this.pLDNode.addChild( pLDRegionPath2 );
 
       // add d sin(θ) and dimension arrow
       const pLDArrowStart = lineStart.plusXY( ( ELEMENT_SPACING + AMP + raySeparation ) * Math.sin( theta ),
@@ -430,19 +432,63 @@ class XrayDiffractionScreenView extends ScreenView {
       const pLDLabelCenter = pLDArrowStart.plusXY( ELEMENT_SPACING * Math.sin( theta ) - ( dSinTheta * Math.cos( theta ) ) / 2,
         ELEMENT_SPACING * Math.cos( theta ) + ( dSinTheta * Math.sin( theta ) ) / 2 );
       const pLDDimensionArrow = new ArrowNode( pLDArrowStart.x, pLDArrowStart.y, pLDArrowEnd.x, pLDArrowEnd.y, DIMENSION_ARROW_OPTIONS );
-
       const pLDDimensionLabel = new RichText( dSinThetaString, { maxWidth: 200, left: pLDLabelCenter.x, centerY: pLDLabelCenter.y } );
+
       // add a translucent white background behind the label text - could also use BackgroundNode
       const pLDLabelBackground = new Rectangle( pLDDimensionLabel.x, pLDDimensionLabel.top,
         pLDDimensionLabel.width + 2, pLDDimensionLabel.height + 2, 4, 4, {
           fill: 'white',
-          opacity: 0.6
+          opacity: 0.65
         } );
-      this.lightPathsNode.addChild( pLDLabelBackground );
-      this.lightPathsNode.addChild( pLDDimensionLabel );
-      this.lightPathsNode.addChild( pLDDimensionArrow );
+      this.pLDNode.addChild( pLDLabelBackground );
+      this.pLDNode.addChild( pLDDimensionLabel );
+      this.pLDNode.addChild( pLDDimensionArrow );
+      this.pLDNode.setVisible( true );
+
+      // Show Path difference information next to crystal
+      const pLDDiagramBG = new Rectangle( 0, 0, 2 * dSinTheta, 2 * AMP, {
+        lineWidth: model.inPhaseProperty.value ? 2 : 0.5,
+        stroke: 'black',
+        fill: 'rgba( 64, 0, 0, 0.25 )'
+      } );
+      const pLDDiagram = new LightPathNode( new Vector2( pLDDiagramBG.left, AMP ), new Vector2( pLDDiagramBG.right, AMP ),
+        model.sourceWavelengthProperty.value * SCALE_FACTOR, {
+          amplitude: AMP,
+          waveFrontWidth: 2 * AMP,
+          waveFrontPattern: () => 'black'
+        } );
+      pLDDiagram.addChild( pLDDiagramBG ); // add a background to the light wave
+
+      const pLDDiagramDimensionArrow = new ArrowNode( pLDDiagramBG.left, 0, pLDDiagramBG.right, 0, DIMENSION_ARROW_OPTIONS );
+
+      // Text nodes that reflects 2dsin(Theta), and 2dsin(Theta)/wavelength
+      const _2dSinText = new RichText( StringUtils.fillIn( pLDString, {
+        interplaneDistance: interplaneDistanceString,
+        value: Utils.toFixed( model.pLDProperty.value, 1 ),
+        unit: lengthUnitString
+      } ), TEXT_OPTIONS );
+      const _2dSinLambdaText = new RichText( StringUtils.fillIn( braggEquationString, {
+        interplaneDistance: interplaneDistanceString,
+        value: Utils.toFixed( model.pLDWavelengthsProperty.value, 2 )
+      } ), TEXT_OPTIONS );
+
+      const pLDPanel = new Panel( new VBox( {
+        children: [ _2dSinLambdaText, pLDDiagram, pLDDiagramDimensionArrow, _2dSinText ],
+        align: 'center',
+        spacing: ELEMENT_SPACING
+      } ), {
+        xMargin: 0,
+        yMargin: 0,
+        fill: 'rgba( 255, 255, 255, 0.75 )',
+        lineWidth: 0,
+        left: this.crystalNode.right,
+        centerY: pLDLabelCenter.y,
+        cornerRadius: 6
+      } );
+
+      pLDPanel.right = Math.min( pLDPanel.right, this.controlPanel.left ); // avoid covering the control panels
+      this.pLDNode.addChild( pLDPanel );
     }
-    this.addChild( this.lightPathsNode );
   }
 
   /**

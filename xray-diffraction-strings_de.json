@@ -15,10 +15,10 @@
     "value": "a = {{value}}{{unit}}"
   },
   "bdLatticeEquals": {
-    "value": "b = d = {{value}}{{unit}}"
+    "value": "d = b = {{value}}{{unit}}"
   },
   "braggEquation": {
-    "value": "2{{interplaneDistance}} sin(θ)/λ = {{value}}"
+    "value": "2{{interplaneDistance}}<i>sin</i>(θ)/λ = {{value}}"
   },
   "dSinTheta": {
     "value": "d<i>sin</i>(θ)"
@@ -45,7 +45,7 @@
     "value": "Pfadunterschied"
   },
   "pLD": {
-    "value": "2{{interplaneDistance}} sin(θ) = {{value}}{{unit}}"
+    "value": "2{{interplaneDistance}}<i>sin</i>(θ) = {{value}}{{unit}}"
   },
   "showTransmitted": {
     "value": "Sendestrahl"
@@ -54,7 +54,7 @@
     "value": "Vertikale Strahlen"
   },
   "waveFrontMarkers": {
-    "value": "Wellenfrontindikatoren:"
+    "value": "Wellenfronten:"
   },
   "wavelength": {
     "value": "Wellenlänge: {{value}}{{unit}}"

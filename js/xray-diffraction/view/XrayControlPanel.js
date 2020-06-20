@@ -18,7 +18,6 @@ import NumberControl from '../../../../scenery-phet/js/NumberControl.js';
 import Panel from '../../../../sun/js/Panel.js';
 import Path from '../../../../scenery/js/nodes/Path.js';
 import PhetFont from '../../../../scenery-phet/js/PhetFont.js';
-import Property from '../../../../axon/js/Property.js';
 import RadioButtonGroup from '../../../../sun/js/buttons/RadioButtonGroup.js';
 import Range from '../../../../dot/js/Range.js';
 import Shape from '../../../../kite/js/Shape.js';
@@ -34,14 +33,11 @@ import xrayDiffractionStrings from '../../xrayDiffractionStrings.js';
 const angleUnitString = xrayDiffractionStrings.angleUnit;
 const aLatticeEqualsString = xrayDiffractionStrings.aLatticeEquals;
 const bdLatticeEqualsString = xrayDiffractionStrings.bdLatticeEquals;
-const braggEquationString = xrayDiffractionStrings.braggEquation;
 const horizontalRaysString = xrayDiffractionStrings.horizontalRays;
 const incidentAngleString = xrayDiffractionStrings.incidentAngle;
-const interplaneDistanceString = xrayDiffractionStrings.interplaneDistance;
 const lengthUnitString = xrayDiffractionStrings.lengthUnit;
 const moreParametersString = xrayDiffractionStrings.moreParameters;
 const pathDifferenceString = xrayDiffractionStrings.pathDifference;
-const pLDString = xrayDiffractionStrings.pLD;
 const showTransmittedString = xrayDiffractionStrings.showTransmitted;
 const verticalRaysString = xrayDiffractionStrings.verticalRays;
 const wavefrontsMarkersString = xrayDiffractionStrings.waveFrontMarkers;
@@ -50,22 +46,25 @@ const wavelengthString = xrayDiffractionStrings.wavelength;
 const TEXT_OPTIONS = { font: new PhetFont( { family: 'Verdana', size: 14 } ), maxWidth: 200, align: 'center', setBoundsMethod: 'accurate' };
 const SLIDER_OPTIONS = { trackSize: new Dimension2( 90, 1 ), thumbSize: new Dimension2( 13, 22 ) };
 const ELEMENT_SPACING = XrayDiffractionConstants.ELEMENT_SPACING;
+const SLIDER_SPACING = XrayDiffractionConstants.ELEMENT_SPACING * 2.6;
 
 class XrayControlPanel extends VBox {
 
   /**
    * @param {XrayDiffractionModel} model
+   * @param {Node} timeControlNode
    * @param {Object} [options]
    */
 
-  constructor( model, options ) {
+  constructor( model, timeControlNode, options ) {
 
     options = merge( {
       xMargin: 15,
       yMargin: 8,
       fill: '#F0F0F0',
       stroke: 'gray',
-      lineWidth: 1
+      lineWidth: 1,
+      cornerRadius: 6
     }, options );
 
     // We are manually controlling the title and the number rather than the built in NumberControl functionality so that
@@ -188,6 +187,11 @@ class XrayControlPanel extends VBox {
       model.showTransmittedProperty, { boxWidth: 15 } );
 
     const waveFrontMarkersTitle = new Text( wavefrontsMarkersString, TEXT_OPTIONS );
+    const waveFrontGroup = new VBox( {
+      align: 'left',
+      children: [ waveFrontMarkersTitle, wavefrontRadioGroup ],
+      spacing: ELEMENT_SPACING
+    } );
 
     const separator = new HSeparator( _.max( [
       angleControl.width,
@@ -210,13 +214,13 @@ class XrayControlPanel extends VBox {
     // main control panel. Items can easily be rearranged here. Use Panel if you have to set a width inside a VBox.
     const checkboxes = new VBox( {
       align: 'left',
-      children: [ separator, pathDifferenceCheckbox, showTransmittedCheckbox, separator2 ],
+      children: [ separator, pathDifferenceCheckbox, showTransmittedCheckbox, separator2, waveFrontGroup ],
       spacing: ELEMENT_SPACING
     } );
     const content = new VBox( {
       align: 'center',
-      children: [ angleControl, wavelengthControl, bLatticeControl, checkboxes, waveFrontMarkersTitle, wavefrontRadioGroup ],
-      spacing: ELEMENT_SPACING
+      children: [ angleControl, wavelengthControl, bLatticeControl, checkboxes ],
+      spacing: SLIDER_SPACING
     } );
     const mainContent = new Panel( content, options );
 
@@ -224,7 +228,7 @@ class XrayControlPanel extends VBox {
     const optionalParameters = new VBox( {
       align: 'center',
       children: [ aLatticeControl, verticalControl, horizontalControl ],
-      spacing: ELEMENT_SPACING
+      spacing: SLIDER_SPACING
     } );
 
     const accordianOptional = new AccordionBox( optionalParameters, merge( {
@@ -234,47 +238,10 @@ class XrayControlPanel extends VBox {
       showTitleWhenExpanded: true
     }, options ) );
 
-    // Text nodes that reflects the incident angle, lattice parameters, wavelength, 2dsin(Theta), and 2dsin(Theta)/wavelength
-    const _2dSinText = new Text( '?', TEXT_OPTIONS );
-    const _2dSinLambdaText = new Text( '?', TEXT_OPTIONS );
-    const equationPanel = new Panel( new VBox( { children: [ ( _2dSinText ), ( _2dSinLambdaText ) ] } ), {
-      align: 'center',
-      minWidth: separator.width
-    } );
-
-    // Links the current incident angle, lattice parameters, wavelength, 2dsin(Theta), and 2dsin(Theta)/wavelength
-    // to the text variables declared above
-    // This link exists for the entire duration of the sim. No need to dispose.
-    Property.multilink( [
-      model.sourceAngleProperty,
-      model.lattice.latticeConstantsProperty,
-      model.sourceWavelengthProperty
-    ], () => {
-      const _2dSinTheta = 2 * model.lattice.latticeConstantsProperty.value.z * Math.sin( model.sourceAngleProperty.value );
-      _2dSinText.text = StringUtils.fillIn( pLDString, {
-        interplaneDistance: interplaneDistanceString,
-        value: Utils.toFixed( _2dSinTheta, 1 ),
-        unit: lengthUnitString
-      } );
-      _2dSinLambdaText.text = StringUtils.fillIn( braggEquationString, {
-        interplaneDistance: interplaneDistanceString,
-        value: Utils.toFixed( _2dSinTheta / model.sourceWavelengthProperty.value, 2 )
-      } );
-    } );
-    model.pathDifferenceProperty.link( trueFalse => {
-      if ( trueFalse ) {
-        checkboxes.insertChild( checkboxes.indexOfChild( pathDifferenceCheckbox ) + 1, ( equationPanel ) );
-      }
-      else {
-        if ( checkboxes.hasChild( equationPanel ) ) {
-          checkboxes.removeChild( equationPanel );
-        }
-      }
-    } );
-
     super( {
-      children: [ mainContent, accordianOptional ],
-      spacing: ELEMENT_SPACING
+      children: [ mainContent, timeControlNode, accordianOptional ],
+      spacing: 2 * ELEMENT_SPACING,
+      align: 'left'
     } );
   }
 }

@@ -95,6 +95,11 @@ class XrayDiffractionModel {
     }
   }
 
+  /**
+   * Steps the model by one timestep
+   * @param {number} dt - time step, in seconds
+   * @public
+   */
   manualStep( dt ) {
     // The following sets the speed of light at 3 Angstrom/s (ω = 2πv/λ = 2π x 3/λ = 18.85/λ)
     this.startPhase = this.startPhase - 19 / this.sourceWavelengthProperty.value * dt;

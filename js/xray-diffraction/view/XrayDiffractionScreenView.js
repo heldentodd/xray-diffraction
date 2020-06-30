@@ -1,7 +1,7 @@
 // Copyright 2020, University of Colorado Boulder
 
 /**
- * @author Todd Holden (Queensborough Community College of CUNY)
+ * @author Todd Holden (https://tholden79.wixsite.com/mysite2)
  */
 
 import BooleanProperty from '../../../../axon/js/BooleanProperty.js';

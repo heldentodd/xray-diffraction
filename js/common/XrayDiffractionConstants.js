@@ -3,7 +3,7 @@
 /**
  * Constants used throughout this simulation.
  *
- * @author Todd Holden (Queensborough Community College of CUNY)
+ * @author Todd Holden (https://tholden79.wixsite.com/mysite2)
  */
 
 import xrayDiffraction from '../xrayDiffraction.js';

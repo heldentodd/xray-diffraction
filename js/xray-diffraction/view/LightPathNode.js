@@ -3,7 +3,7 @@
 /**
  * Draws a sinusoidal wave with a dashed line to represent a light path. Can also display wavefronts in multicolor.
  *
- * @author Todd Holden (Queensborough Community College of CUNY)
+ * @author Todd Holden (https://tholden79.wixsite.com/mysite2)
  */
 
 // modules

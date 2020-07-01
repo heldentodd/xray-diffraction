@@ -3,7 +3,7 @@
 /**
  * Main entry point for the sim.
  *
- * @author Todd Holden (Queensborough Community College of CUNY)
+ * @author Todd Holden (https://tholden79.wixsite.com/mysite2)
  */
 
 import Sim from '../../joist/js/Sim.js';

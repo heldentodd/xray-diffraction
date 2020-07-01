@@ -3,7 +3,7 @@
 /**
  * View for the Crystal lattice, displays a 2D array of atomic nuclei to represent the crystal.
  *
- * @author Todd Holden (Queensborough Community College of CUNY)
+ * @author Todd Holden (https://tholden79.wixsite.com/mysite2)
  */
 
 // modules

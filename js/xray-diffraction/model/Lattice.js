@@ -6,7 +6,7 @@
  *   - storing the lattice constants.
  *   - Keeping track of the angle (orientation) of the crystal.
  *
- * @author Todd Holden (Queensborough Community College of CUNY)
+ * @author Todd Holden (https://tholden79.wixsite.com/mysite2)
  */
 
 // modules

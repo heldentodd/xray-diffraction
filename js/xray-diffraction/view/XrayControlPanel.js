@@ -3,7 +3,7 @@
 /**
  * Shows the main controls, including frequency/wavelength and amplitude.
  *
- * @author Todd Holden (Queensborough Community College of CUNY)
+ * @author Todd Holden (https://tholden79.wixsite.com/mysite2)
  */
 
 // modules

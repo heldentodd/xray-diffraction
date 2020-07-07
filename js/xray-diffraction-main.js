@@ -10,6 +10,7 @@ import Sim from '../../joist/js/Sim.js';
 import simLauncher from '../../joist/js/simLauncher.js';
 import Tandem from '../../tandem/js/Tandem.js';
 import XrayDiffractionScreen from './xray-diffraction/XrayDiffractionScreen.js';
+import RotatingXRDScreen from './rotating-xrd/XrayDiffractionScreen.js';
 import xrayDiffractionStrings from './xrayDiffractionStrings.js';
 
 const xrayDiffractionTitleString = xrayDiffractionStrings[ 'xray-diffraction' ].title;
@@ -31,7 +32,8 @@ const simOptions = {
 // until the images are fully loaded, see https://github.com/phetsims/coulombs-law/issues/70
 simLauncher.launch( () => {
   const sim = new Sim( xrayDiffractionTitleString, [
-    new XrayDiffractionScreen( Tandem.ROOT.createTandem( 'xrayDiffractionScreen' ) )
+    new XrayDiffractionScreen( Tandem.ROOT.createTandem( 'xrayDiffractionScreen' ) ),
+    new RotatingXRDScreen( Tandem.ROOT.createTandem( 'RotatingXRDScreen' ) )
   ], simOptions );
   sim.start();
 } );
